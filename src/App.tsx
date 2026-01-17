@@ -29,9 +29,9 @@ function App() {
     }
   };
 
-  const handleCreateTask = async (title: string) => {
+  const handleCreateTask = async (title: string, description?: string, scheduledDateTime?: string) => {
     try {
-      const newTask = await createTask(title);
+      const newTask = await createTask(title, description, scheduledDateTime);
       setTasks([...tasks, newTask]);
     } catch (error) {
       console.error('Failed to create task:', error);
@@ -50,9 +50,9 @@ function App() {
     }
   };
 
-  const handleUpdateTask = async (id: string, title: string) => {
+  const handleUpdateTask = async (id: string, title: string, description?: string, scheduledDateTime?: string) => {
     try {
-      const updatedTask = await updateTask(id, { title });
+      const updatedTask = await updateTask(id, { title, description: description || undefined, scheduledDateTime: scheduledDateTime || undefined });
       setTasks(tasks.map((t) => (t.id === id ? updatedTask : t)));
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -91,6 +91,10 @@ function App() {
         <header className={styles.header}>
           <h1 className={styles.title}>🌟 SmartToDo</h1>
           <p className={styles.subtitle}>Your journey to productivity starts here!</p>
+          <p className={styles.summary}>
+            Organize your tasks with AI-powered suggestions. Get helpful tips, actionable suggestions, 
+            and step-by-step approaches for each task to boost your productivity! 🤖✨
+          </p>
         </header>
 
         <TaskForm onSubmit={handleCreateTask} />

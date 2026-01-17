@@ -5,7 +5,7 @@ import styles from './TaskList.module.css';
 interface TaskListProps {
   tasks: Task[];
   onToggle: (id: string) => void;
-  onUpdate: (id: string, title: string) => void;
+  onUpdate: (id: string, title: string, description?: string, scheduledDateTime?: string) => void;
   onDelete: (id: string) => void;
 }
 

@@ -34,11 +34,13 @@ export const getTasks = (): Promise<Task[]> => {
 };
 
 // Create a new task
-export const createTask = (title: string): Promise<Task> => {
+export const createTask = (title: string, description?: string, scheduledDateTime?: string): Promise<Task> => {
   const tasks = loadTasks();
   const newTask: Task = {
     id: generateId(),
     title: title.trim(),
+    description: description?.trim() || undefined,
+    scheduledDateTime: scheduledDateTime || undefined,
     completed: false,
     createdAt: new Date().toISOString(),
   };

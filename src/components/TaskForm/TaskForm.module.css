@@ -1,8 +1,21 @@
 .form {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: 32px;
   animation: fadeInUp 0.5s ease-out;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .input {
@@ -60,6 +73,160 @@
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.addDescriptionButton {
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  color: #6366f1;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #ffffff;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.addDescriptionButton:hover {
+  border-color: #6366f1;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.hintText {
+  font-size: 14px;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  text-align: left;
+  line-height: 1.5;
+  padding-left: 4px;
+  opacity: 0.95;
+  animation: fadeInHint 0.4s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeInHint {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+}
+
+.textarea {
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Nunito', sans-serif;
+  border: 3px solid #ffffff;
+  border-radius: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  resize: vertical;
+  min-height: 80px;
+}
+
+.textarea:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.3), 0 6px 20px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+}
+
+.textarea::placeholder {
+  color: #6b7280;
+}
+
+.dateTimeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addDateTimeButton {
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  color: #10b981;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #ffffff;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  align-self: flex-start;
+}
+
+.addDateTimeButton:hover {
+  border-color: #10b981;
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+}
+
+.dateTimePicker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #10b981;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+.dateTimeLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: #065f46;
+  font-family: 'Nunito', sans-serif;
+}
+
+.clearDateTimeButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  color: #dc2626;
+  background: #fee2e2;
+  border: 2px solid #fecaca;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.clearDateTimeButton:hover {
+  background: #fecaca;
+  border-color: #f87171;
+  transform: translateY(-1px);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInUp {
