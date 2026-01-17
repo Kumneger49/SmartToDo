@@ -7,32 +7,37 @@
 }
 
 .label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #4b5563;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
   font-family: 'Nunito', sans-serif;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .select {
-  padding: 10px 16px;
+  padding: 12px 20px;
   font-size: 16px;
+  font-weight: 600;
   font-family: 'Nunito', sans-serif;
-  color: #4b5563;
-  background: #fff;
-  border: 2px solid #e0e7ff;
-  border-radius: 8px;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #ffffff;
+  border-radius: 10px;
   outline: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .select:hover {
-  border-color: #818cf8;
+  border-color: #fbbf24;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
 .select:focus {
-  border-color: #818cf8;
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.3), 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes fadeIn {
