@@ -4,6 +4,7 @@ import { Filter, FilterStatus } from './components/Filter/Filter';
 import { TaskForm } from './components/TaskForm/TaskForm';
 import { TaskList } from './components/TaskList/TaskList';
 import { EmptyState } from './components/EmptyState/EmptyState';
+import { TodayOverview } from './components/TodayOverview/TodayOverview';
 import { getTasks, createTask, updateTask, deleteTask } from './api/mockApi';
 import styles from './App.module.css';
 
@@ -89,8 +90,10 @@ function App() {
     <div className={styles.app}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1 className={styles.title}>🌟 SmartToDo</h1>
-          <p className={styles.subtitle}>Your journey to productivity starts here!</p>
+          <div className={styles.headerTop}>
+            <h1 className={styles.title}>🌟 SmartToDo</h1>
+            <TodayOverview tasks={tasks} />
+          </div>
           <p className={styles.summary}>
             Organize your tasks with AI-powered suggestions. Get helpful tips, actionable suggestions, 
             and step-by-step approaches for each task to boost your productivity! 🤖✨

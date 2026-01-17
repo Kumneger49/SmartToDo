@@ -18,21 +18,24 @@
   animation: fadeInDown 0.6s ease-out;
 }
 
-.title {
-  font-size: 56px;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0 0 12px 0;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-  letter-spacing: -1px;
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-.subtitle {
-  font-size: 22px;
+.title {
+  font-size: 48px;
+  font-weight: 800;
   color: #ffffff;
-  margin: 0 0 16px 0;
-  font-weight: 600;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  letter-spacing: -1px;
+  flex: 1;
+  min-width: 200px;
 }
 
 .summary {
@@ -41,9 +44,21 @@
   margin: 0 auto;
   font-weight: 500;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
+  max-width: 700px;
   line-height: 1.6;
   opacity: 0.95;
+}
+
+@media (max-width: 600px) {
+  .headerTop {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .title {
+    font-size: 40px;
+    text-align: center;
+  }
 }
 
 .loading {
