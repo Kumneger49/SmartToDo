@@ -1,37 +1,38 @@
 import { useState, FormEvent } from 'react';
-import { DateTimePicker } from '../DateTimePicker/DateTimePicker';
+import { StartEndTimePicker } from '../StartEndTimePicker/StartEndTimePicker';
 import styles from './TaskForm.module.css';
 
 interface TaskFormProps {
-  onSubmit: (title: string, description?: string, scheduledDateTime?: string) => void;
+  onSubmit: (title: string, description?: string, startTime?: string, endTime?: string) => void;
 }
 
 export const TaskForm = ({ onSubmit }: TaskFormProps) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [showDescription, setShowDescription] = useState(false);
-  const [scheduledDateTime, setScheduledDateTime] = useState('');
-  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+  const [date, setDate] = useState<string | undefined>();
+  const [startTime, setStartTime] = useState<string | undefined>();
+  const [endTime, setEndTime] = useState<string | undefined>();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmedTitle = title.trim();
-    if (trimmedTitle) {
+    
+    // Require title, date, start time, and end time
+    if (trimmedTitle && date && startTime && endTime) {
       onSubmit(
         trimmedTitle, 
         description.trim() || undefined,
-        scheduledDateTime || undefined
+        startTime,
+        endTime
       );
       setTitle('');
       setDescription('');
-      setScheduledDateTime('');
+      setDate(undefined);
+      setStartTime(undefined);
+      setEndTime(undefined);
       setShowDescription(false);
-      setShowDateTimePicker(false);
     }
-  };
-
-  const handleDateTimeChange = (isoString: string | undefined) => {
-    setScheduledDateTime(isoString || '');
   };
 
   return (
@@ -78,44 +79,38 @@ export const TaskForm = ({ onSubmit }: TaskFormProps) => {
       )}
       
       <div className={styles.dateTimeSection}>
-        {!showDateTimePicker ? (
-          <button
-            type="button"
-            onClick={() => setShowDateTimePicker(true)}
-            className={styles.addDateTimeButton}
-          >
-            📅 Schedule Task
-          </button>
-        ) : (
-          <div className={styles.dateTimePicker}>
-            <label className={styles.dateTimeLabel}>
-              When do you want to do this task?
-            </label>
-            <DateTimePicker
-              value={scheduledDateTime || undefined}
-              onChange={handleDateTimeChange}
-              min={new Date().toISOString()}
-            />
-            {scheduledDateTime && (
-              <button
-                type="button"
-                onClick={() => {
-                  setScheduledDateTime('');
-                  setShowDateTimePicker(false);
-                }}
-                className={styles.clearDateTimeButton}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-        )}
+        <div className={styles.dateTimePicker}>
+          <label className={styles.dateTimeLabel}>
+            When do you want to do this task? (Required)
+          </label>
+          <StartEndTimePicker
+            date={date}
+            startTime={startTime}
+            endTime={endTime}
+            onDateChange={setDate}
+            onStartTimeChange={setStartTime}
+            onEndTimeChange={setEndTime}
+          />
+          {date && (
+            <button
+              type="button"
+              onClick={() => {
+                setDate(undefined);
+                setStartTime(undefined);
+                setEndTime(undefined);
+              }}
+              className={styles.clearDateTimeButton}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <button 
         type="submit" 
         className={styles.button}
-        disabled={!title.trim()}
+        disabled={!title.trim() || !date || !startTime || !endTime}
       >
         Add Task
       </button>

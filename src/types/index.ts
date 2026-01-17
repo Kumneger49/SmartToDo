@@ -4,5 +4,6 @@ export interface Task {
   description?: string;
   completed: boolean;
   createdAt: string;
-  scheduledDateTime?: string; // ISO string for date and time
+  startTime?: string; // ISO string for start date and time
+  endTime?: string; // ISO string for end date and time
 }

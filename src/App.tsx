@@ -29,9 +29,9 @@ function App() {
     }
   };
 
-  const handleCreateTask = async (title: string, description?: string, scheduledDateTime?: string) => {
+  const handleCreateTask = async (title: string, description?: string, startTime?: string, endTime?: string) => {
     try {
-      const newTask = await createTask(title, description, scheduledDateTime);
+      const newTask = await createTask(title, description, startTime, endTime);
       setTasks([...tasks, newTask]);
     } catch (error) {
       console.error('Failed to create task:', error);
@@ -50,9 +50,9 @@ function App() {
     }
   };
 
-  const handleUpdateTask = async (id: string, title: string, description?: string, scheduledDateTime?: string) => {
+  const handleUpdateTask = async (id: string, title: string, description?: string, startTime?: string, endTime?: string) => {
     try {
-      const updatedTask = await updateTask(id, { title, description: description || undefined, scheduledDateTime: scheduledDateTime || undefined });
+      const updatedTask = await updateTask(id, { title, description: description || undefined, startTime: startTime || undefined, endTime: endTime || undefined });
       setTasks(tasks.map((t) => (t.id === id ? updatedTask : t)));
     } catch (error) {
       console.error('Failed to update task:', error);

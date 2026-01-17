@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { Task } from '../../types';
 import { DeleteConfirmationModal } from '../DeleteConfirmationModal/DeleteConfirmationModal';
 import { AISuggestions } from '../AISuggestions/AISuggestions';
-import { DateTimePicker } from '../DateTimePicker/DateTimePicker';
+import { StartEndTimePicker } from '../StartEndTimePicker/StartEndTimePicker';
 import styles from './TaskItem.module.css';
 
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
-  onUpdate: (id: string, title: string, description?: string, scheduledDateTime?: string) => void;
+  onUpdate: (id: string, title: string, description?: string, startTime?: string, endTime?: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -27,7 +27,7 @@ const formatDate = (isoString: string): { date: string; time: string } => {
   return { date: dateStr, time: timeStr };
 };
 
-const formatScheduledDateTime = (isoString: string): { date: string; time: string } => {
+const formatDateTime = (isoString: string): { date: string; time: string } => {
   const date = new Date(isoString);
   const dateStr = date.toLocaleDateString('en-US', { 
     month: 'short', 
@@ -42,20 +42,35 @@ const formatScheduledDateTime = (isoString: string): { date: string; time: strin
   return { date: dateStr, time: timeStr };
 };
 
+const getDateFromISO = (isoString: string): string => {
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
-  const [editScheduledDateTime, setEditScheduledDateTime] = useState(task.scheduledDateTime || '');
+  const [editDate, setEditDate] = useState<string | undefined>(
+    task.startTime ? getDateFromISO(task.startTime) : undefined
+  );
+  const [editStartTime, setEditStartTime] = useState(task.startTime || '');
+  const [editEndTime, setEditEndTime] = useState(task.endTime || '');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { date, time } = formatDate(task.createdAt);
-  const scheduledDateTime = task.scheduledDateTime ? formatScheduledDateTime(task.scheduledDateTime) : null;
+  const startDateTime = task.startTime ? formatDateTime(task.startTime) : null;
+  const endDateTime = task.endTime ? formatDateTime(task.endTime) : null;
 
   const handleEdit = () => {
     setIsEditing(true);
     setEditTitle(task.title);
     setEditDescription(task.description || '');
-    setEditScheduledDateTime(task.scheduledDateTime || '');
+    setEditDate(task.startTime ? getDateFromISO(task.startTime) : undefined);
+    setEditStartTime(task.startTime || '');
+    setEditEndTime(task.endTime || '');
   };
 
   const handleSave = () => {
@@ -64,9 +79,10 @@ export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
     if (trimmedTitle && (
       trimmedTitle !== task.title || 
       trimmedDescription !== (task.description || '') ||
-      editScheduledDateTime !== (task.scheduledDateTime || '')
+      editStartTime !== (task.startTime || '') ||
+      editEndTime !== (task.endTime || '')
     )) {
-      onUpdate(task.id, trimmedTitle, trimmedDescription || undefined, editScheduledDateTime || undefined);
+      onUpdate(task.id, trimmedTitle, trimmedDescription || undefined, editStartTime || undefined, editEndTime || undefined);
     }
     setIsEditing(false);
   };
@@ -74,12 +90,10 @@ export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
   const handleCancel = () => {
     setEditTitle(task.title);
     setEditDescription(task.description || '');
-    setEditScheduledDateTime(task.scheduledDateTime || '');
+    setEditDate(task.startTime ? getDateFromISO(task.startTime) : undefined);
+    setEditStartTime(task.startTime || '');
+    setEditEndTime(task.endTime || '');
     setIsEditing(false);
-  };
-
-  const handleScheduledDateTimeChange = (isoString: string | undefined) => {
-    setEditScheduledDateTime(isoString || '');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -162,10 +176,13 @@ export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
             />
             <div className={styles.editDateTimeSection}>
               <label className={styles.editDateTimeLabel}>Schedule for:</label>
-              <DateTimePicker
-                value={editScheduledDateTime || undefined}
-                onChange={handleScheduledDateTimeChange}
-                min={new Date().toISOString()}
+              <StartEndTimePicker
+                date={editDate}
+                startTime={editStartTime || undefined}
+                endTime={editEndTime || undefined}
+                onDateChange={setEditDate}
+                onStartTimeChange={(iso) => setEditStartTime(iso || '')}
+                onEndTimeChange={(iso) => setEditEndTime(iso || '')}
               />
             </div>
             <div className={styles.editActions}>
@@ -193,11 +210,19 @@ export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
           <span className={styles.dateText}>Created: {date}</span>
           <span className={styles.timeText}>{time}</span>
         </div>
-        {scheduledDateTime && (
+        {startDateTime && endDateTime && (
           <div className={styles.scheduledInfo}>
             <span className={styles.scheduledIcon}>⏰</span>
             <span className={styles.scheduledText}>
-              Scheduled: {scheduledDateTime.date} at {scheduledDateTime.time}
+              {startDateTime.date === endDateTime.date ? (
+                <>
+                  {startDateTime.date}: {startDateTime.time} - {endDateTime.time}
+                </>
+              ) : (
+                <>
+                  {startDateTime.date} {startDateTime.time} - {endDateTime.date} {endDateTime.time}
+                </>
+              )}
             </span>
           </div>
         )}
