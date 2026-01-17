@@ -1,0 +1,74 @@
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeInBounce 0.8s ease-out;
+}
+
+.emoji {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4b5563;
+  margin: 0 0 12px 0;
+  font-family: 'Nunito', sans-serif;
+}
+
+.message {
+  font-size: 18px;
+  color: #6b7280;
+  margin: 0 0 32px 0;
+  font-family: 'Nunito', sans-serif;
+  line-height: 1.6;
+}
+
+.addButton {
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
+}
+
+.addButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(129, 140, 248, 0.4);
+}
+
+.addButton:active {
+  transform: translateY(-1px);
+}
+
+@keyframes fadeInBounce {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
