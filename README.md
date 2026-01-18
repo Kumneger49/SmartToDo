@@ -1,82 +1,192 @@
-# SmartToDo - Task Management Application
+# BarakaFlow
 
-A clean, modern, and welcoming task management web application built with React, TypeScript, and Vite.
+A modern, AI-powered task management application built for teams. BarakaFlow combines intuitive task management with AI assistance to help teams stay organized and productive.
 
-## Features
+## 🚀 Live Application
 
-- ✅ Full CRUD operations on tasks
-- 🔍 Filter tasks by status (All, Active, Completed)
-- ✏️ Edit task titles inline
-- 🗑️ Delete tasks with confirmation
-- 🎨 Beautiful, welcoming UI with smooth animations
-- 📱 Responsive design
+- **Frontend:** [https://smart-to-do-rho.vercel.app](https://smart-to-do-rho.vercel.app)
+- **Backend API:** [https://smarttodo-1-in05.onrender.com/api](https://smarttodo-1-in05.onrender.com/api)
 
-## Technology Stack
+## ✨ Features
 
-- **Frontend**: React 18, Vite, TypeScript
-- **Styling**: CSS Modules
-- **State Management**: React useState and useEffect
-- **Deployment**: Vercel (pending)
+### Core Functionality
+- **User Authentication** - Secure signup and login with JWT tokens
+- **Task Management** - Full CRUD operations with a modern table-based interface
+- **Task Scheduling** - Set start and end times for tasks
+- **Task Status Tracking** - Not started, Pending, Completed, Stuck
+- **Task Ownership** - Assign tasks to team members
+- **Recurring Tasks** - Daily, weekly, monthly, or yearly recurrence patterns
+- **Task Updates** - Conversation-style updates with replies and likes
+- **Search & Filter** - Filter by status (All, Completed, Pending, Not Started, Today)
 
-## Getting Started
+### AI-Powered Features
+- **AI Task Suggestions** - Get personalized tips, suggestions, and step-by-step approaches for each task
+- **Day Optimization** - AI-powered daily schedule optimization with break recommendations
+- **Interactive Chat** - Chat with AI about tasks and get real-time assistance
+- **Context-Aware** - AI suggestions consider task title, description, status, timeline, and update history
+
+### User Experience
+- **Modern UI** - Clean, minimal design inspired by Monday.com
+- **Inline Editing** - Edit tasks directly in the table
+- **Real-time Updates** - Instant feedback on all actions
+- **Responsive Design** - Works on desktop and mobile devices
+- **Empty States** - Welcoming messages when no tasks exist
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **CSS Modules** - Scoped styling
+- **OpenAI API** - AI-powered features (GPT-4o-mini)
+
+### Backend
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **TypeScript** - Type safety
+- **MongoDB** - Database (via Mongoose)
+- **JWT** - Authentication
+- **bcrypt** - Password hashing
+
+### Deployment
+- **Vercel** - Frontend hosting
+- **Render** - Backend hosting
+- **MongoDB Atlas** - Cloud database
+
+## 📁 Project Structure
+
+```
+SmartToDo/
+├── src/                    # Frontend source code
+│   ├── api/               # API clients (OpenAI, backend)
+│   ├── components/        # React components
+│   ├── types/             # TypeScript type definitions
+│   ├── utils/             # Utility functions
+│   ├── App.tsx            # Main application component
+│   └── main.tsx           # Application entry point
+├── server/                # Backend source code
+│   ├── src/
+│   │   ├── config/        # Database configuration
+│   │   ├── models/        # Mongoose models
+│   │   ├── routes/        # API routes
+│   │   ├── middleware/   # Express middleware
+│   │   └── index.ts       # Server entry point
+│   └── package.json
+├── package.json           # Frontend dependencies
+└── README.md              # This file
+```
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js (v18 or higher)
 - npm or yarn
+- MongoDB Atlas account (or local MongoDB)
+- OpenAI API key
 
 ### Installation
 
-1. Install dependencies:
-```bash
-npm install
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Kumneger49/SmartToDo.git
+   cd SmartToDo
+   ```
+
+2. **Install frontend dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Install backend dependencies**
+   ```bash
+   cd server
+   npm install
+   cd ..
+   ```
+
+4. **Set up environment variables**
+
+   **Frontend (.env):**
+   ```env
+   VITE_API_URL=http://localhost:3000/api
+   VITE_OPENAI_API_KEY=your-openai-api-key
+   ```
+
+   **Backend (server/.env):**
+   ```env
+   PORT=3000
+   NODE_ENV=development
+   MONGODB_URI=your-mongodb-connection-string
+   JWT_SECRET=your-jwt-secret
+   CORS_ORIGIN=http://localhost:5173
+   ```
+
+5. **Start the backend server**
+   ```bash
+   cd server
+   npm run dev
+   ```
+
+6. **Start the frontend development server**
+   ```bash
+   npm run dev
+   ```
+
+7. **Open your browser**
+   - Navigate to `http://localhost:5173`
+
+## 📝 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/verify` - Verify JWT token
+
+### Tasks (Protected - requires authentication)
+- `GET /api/tasks` - Get all user's tasks
+- `POST /api/tasks` - Create new task
+- `PUT /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
+
+## 🔐 Authentication
+
+All task endpoints require a JWT token in the Authorization header:
+```
+Authorization: Bearer <your-jwt-token>
 ```
 
-2. Start the development server:
-```bash
-npm run dev
-```
+Tokens are automatically stored in localStorage after login/signup.
 
-3. Open your browser and navigate to `http://localhost:5173`
+## 🎨 Key Components
 
-### Build
+- **TaskTable** - Main table view for tasks with inline editing
+- **TaskRow** - Individual task row with all editable fields
+- **AISuggestionsPanel** - AI-powered task assistance
+- **TodayOverview** - Daily optimization suggestions
+- **UpdatesModal** - Task updates and conversations
+- **TimelineCell** - Date and time picker for task scheduling
+- **OwnerCell** - Task ownership assignment
+- **StatusCell** - Task status management
+- **RecurrencePicker** - Task recurrence selection
 
-To build for production:
-```bash
-npm run build
-```
+## 🚢 Deployment
 
-## Project Structure
+The application is deployed and live:
 
-```
-src/
-├── api/           # Mock API layer
-├── components/    # React components
-├── types/         # TypeScript type definitions
-├── styles/        # Global styles
-├── App.tsx        # Main application component
-└── main.tsx       # Application entry point
-```
+- **Frontend:** Deployed on Vercel with automatic deployments from main branch
+- **Backend:** Deployed on Render with MongoDB Atlas database
+- **Environment Variables:** Configured in respective platforms
 
-## Features in Detail
+## 📄 License
 
-- **Create Tasks**: Add new tasks with a welcoming input field
-- **View Tasks**: See all your tasks in a clean, organized list
-- **Edit Tasks**: Click the edit button to modify task titles
-- **Toggle Completion**: Check/uncheck tasks to mark them as complete
-- **Delete Tasks**: Remove tasks with a confirmation dialog
-- **Filter Tasks**: Use the dropdown to filter by All, Active, or Completed status
-- **Empty State**: Beautiful empty state with encouraging message when no tasks exist
+This project was built as a demonstration of full-stack development skills.
 
-## Development Phases
+## 👤 Author
 
-This project was developed following incremental commits:
-1. Project initialization
-2. Data model and mock API
-3. UI components
-4. CRUD functionality
-5. UX polish
+Built by Kumneger Matewos
 
 ---
 
-Built with ❤️ and attention to detail
+**Note:** This is a production-ready application with authentication, database persistence, and AI integration. All features are fully functional and deployed.

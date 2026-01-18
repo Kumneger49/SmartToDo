@@ -1,41 +1,82 @@
+/**
+ * OpenAI API Integration
+ * 
+ * Handles all interactions with OpenAI GPT-4o-mini model
+ * Provides AI-powered task suggestions and day optimization
+ * Includes conversation history management with token truncation
+ * 
+ * @fileoverview OpenAI API client for AI features
+ */
+
+/**
+ * AI suggestions interface
+ * Structure of AI-generated task suggestions
+ */
 export interface AISuggestions {
-  tips: string[];
-  suggestions: string[];
-  approach: string;
+  tips: string[]; // Helpful tips for the task
+  suggestions: string[]; // Actionable suggestions
+  approach: string; // Step-by-step approach
 }
 
+/**
+ * Day optimization interface
+ * Structure of AI-generated daily schedule optimization
+ */
 export interface DayOptimization {
-  summary: string;
-  breakSuggestions: string[];
-  energyManagement: string[];
-  actionableSteps: string[];
+  summary: string; // Overall summary of the day
+  breakSuggestions: string[]; // Recommended break times
+  energyManagement: string[]; // Energy management tips
+  actionableSteps: string[]; // Actionable optimization steps
 }
 
+/**
+ * Chat message interface
+ * Represents a message in the conversation history
+ */
 export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
+  role: 'user' | 'assistant'; // Message sender role
+  content: string; // Message content
+  timestamp: string; // ISO timestamp
 }
 
-// Estimate token count (rough approximation: 1 token ≈ 4 characters)
+/**
+ * Estimate token count for text
+ * Rough approximation: 1 token ≈ 4 characters
+ * Used for managing conversation history size
+ * 
+ * @param text - Text to estimate tokens for
+ * @returns Estimated token count
+ */
 const estimateTokens = (text: string): number => {
   return Math.ceil(text.length / 4);
 };
 
-// Truncate conversation history to stay within token limits
-// Keep system prompt + context + recent messages (within limit)
+/**
+ * Truncate conversation history to stay within token limits
+ * 
+ * Keeps system prompt + context + recent messages (within limit)
+ * Removes oldest messages first to fit within maxTokens
+ * 
+ * @param systemPrompt - System prompt text
+ * @param contextData - Context data text
+ * @param messages - Array of chat messages
+ * @param maxTokens - Maximum tokens allowed (default: 8000)
+ * @returns Truncated array of messages that fit within token limit
+ */
 const truncateConversation = (
   systemPrompt: string,
   contextData: string,
   messages: ChatMessage[],
   maxTokens: number = 8000 // Conservative limit for gpt-4o-mini (128k context, but we want to be safe)
 ): ChatMessage[] => {
+  // Calculate tokens needed for system prompt and context
   const systemTokens = estimateTokens(systemPrompt);
   const contextTokens = estimateTokens(contextData);
-  const reservedTokens = systemTokens + contextTokens + 500; // Reserve for response
+  const reservedTokens = systemTokens + contextTokens + 500; // Reserve tokens for AI response
   const availableTokens = maxTokens - reservedTokens;
 
   // Start from the most recent messages and work backwards
+  // This ensures we keep the most relevant recent conversation
   const truncated: ChatMessage[] = [];
   let currentTokens = 0;
 
@@ -44,11 +85,12 @@ const truncateConversation = (
     const message = messages[i];
     const messageTokens = estimateTokens(message.content);
 
+    // Add message if it fits within available token budget
     if (currentTokens + messageTokens <= availableTokens) {
-      truncated.unshift(message); // Add to beginning
+      truncated.unshift(message); // Add to beginning to maintain chronological order
       currentTokens += messageTokens;
     } else {
-      // If we can't fit this message, stop
+      // If we can't fit this message, stop truncating
       break;
     }
   }
@@ -56,32 +98,48 @@ const truncateConversation = (
   return truncated;
 };
 
+// Get OpenAI API key from environment variables
 // Vite only exposes environment variables prefixed with VITE_ to the client
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
+// OpenAI API endpoint for chat completions
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+/**
+ * Task context interface
+ * Contains all task information needed for AI suggestions
+ */
 export interface TaskContext {
-  title: string;
-  description?: string;
-  owner?: string;
-  status: 'not-started' | 'pending' | 'completed';
-  startTime?: string;
-  endTime?: string;
+  title: string; // Task title
+  description?: string; // Optional task description
+  owner?: string; // Task owner name
+  status: 'not-started' | 'pending' | 'completed'; // Current task status
+  startTime?: string; // ISO string for start date/time
+  endTime?: string; // ISO string for end date/time
   updates?: Array<{
     author: string;
     content: string;
     timestamp: string;
     likes: number;
-  }>;
+  }>; // Recent task updates for context
 }
 
+/**
+ * Get AI-powered suggestions for a task
+ * 
+ * Analyzes task context (title, description, status, timeline, updates)
+ * and generates personalized tips, suggestions, and approach
+ * 
+ * @param taskContext - Complete task context for AI analysis
+ * @returns AI-generated suggestions
+ * @throws Error if API key is missing or API call fails
+ */
 export const getAISuggestions = async (taskContext: TaskContext): Promise<AISuggestions> => {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY=your_key to your .env file. Note: In Vite, environment variables must be prefixed with VITE_ to be accessible in the client.');
   }
 
-  // Format timeline information
+  // Format timeline information for the prompt
   let timelineInfo = '';
   if (taskContext.startTime && taskContext.endTime) {
     const startDate = new Date(taskContext.startTime);
@@ -103,7 +161,8 @@ export const getAISuggestions = async (taskContext: TaskContext): Promise<AISugg
     timelineInfo = `\nTimeline: ${startStr} - ${endStr}`;
   }
 
-  // Format update history
+  // Format recent update history for context
+  // Only include last 5 updates to keep prompt concise
   let updatesInfo = '';
   if (taskContext.updates && taskContext.updates.length > 0) {
     const recentUpdates = taskContext.updates.slice(-5).map((update, idx) => {
@@ -119,11 +178,14 @@ export const getAISuggestions = async (taskContext: TaskContext): Promise<AISugg
     updatesInfo = `\n\nRecent Update History:\n${recentUpdates}`;
   }
 
+  // Build comprehensive task information string
   const taskInfo = `Task Title: "${taskContext.title}"
 ${taskContext.description ? `Description: "${taskContext.description}"` : ''}
 Owner: ${taskContext.owner || 'You'}
 Status: ${taskContext.status}${timelineInfo}${updatesInfo}`;
 
+  // Construct prompt for OpenAI API
+  // Includes all task context for personalized suggestions
   const prompt = `You are an expert productivity assistant. Analyze the following task with all its context and provide personalized, specific suggestions.
 
 ${taskInfo}
@@ -146,14 +208,15 @@ Guidelines:
 - Be practical, actionable, and encouraging`;
 
   try {
+    // Make API request to OpenAI
     const response = await fetch(OPENAI_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`, // Include API key in Authorization header
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o-mini', // Use GPT-4o-mini for cost efficiency
         messages: [
           {
             role: 'system',
@@ -164,11 +227,12 @@ Guidelines:
             content: prompt,
           },
         ],
-        temperature: 0.7,
-        max_tokens: 500,
+        temperature: 0.7, // Balance between creativity and consistency
+        max_tokens: 500, // Limit response length
       }),
     });
 
+    // Handle API errors
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error?.message || `OpenAI API error: ${response.statusText}`);
@@ -181,7 +245,7 @@ Guidelines:
       throw new Error('No response from OpenAI API');
     }
 
-    // Parse JSON response
+    // Parse JSON response (extract JSON from potential markdown formatting)
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('Invalid JSON response from OpenAI');
@@ -196,6 +260,7 @@ Guidelines:
 
     return suggestions;
   } catch (error) {
+    // Re-throw errors with proper error handling
     if (error instanceof Error) {
       throw error;
     }
@@ -203,12 +268,22 @@ Guidelines:
   }
 };
 
+/**
+ * Get AI-powered day optimization suggestions
+ * 
+ * Analyzes all tasks scheduled for a specific day
+ * Provides break suggestions, energy management tips, and actionable steps
+ * 
+ * @param tasks - Array of tasks scheduled for the day
+ * @returns AI-generated day optimization recommendations
+ * @throws Error if API key is missing or API call fails
+ */
 export const getDayOptimization = async (tasks: Array<{ title: string; description?: string; startTime: string; endTime: string }>): Promise<DayOptimization> => {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY=your_key to your .env file.');
   }
 
-  // Format tasks for the prompt
+  // Format tasks for the prompt with timing information
   const tasksList = tasks.map((task, index) => {
     const startDate = new Date(task.startTime);
     const endDate = new Date(task.endTime);
