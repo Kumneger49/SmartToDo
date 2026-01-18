@@ -19,13 +19,16 @@ interface TaskRowProps {
 
 export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: TaskRowProps) => {
   const [editingTitle, setEditingTitle] = useState(isNew);
+  const [editingDescription, setEditingDescription] = useState(false);
   const [titleValue, setTitleValue] = useState(task?.title || '');
+  const [descriptionValue, setDescriptionValue] = useState(task?.description || '');
   const [ownerValue, setOwnerValue] = useState(task?.owner);
   const [statusValue, setStatusValue] = useState<Task['status']>(task?.status || 'not-started');
   const [startTimeValue, setStartTimeValue] = useState(task?.startTime);
   const [endTimeValue, setEndTimeValue] = useState(task?.endTime);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isNew && titleInputRef.current) {
@@ -37,13 +40,15 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
   useEffect(() => {
     if (task && !isNew) {
       setTitleValue(task.title);
+      setDescriptionValue(task.description || '');
       setOwnerValue(task.owner);
       setStatusValue(task.status || 'not-started');
       setStartTimeValue(task.startTime);
       setEndTimeValue(task.endTime);
       setEditingTitle(false);
+      setEditingDescription(false);
     }
-  }, [task?.id, task?.title, task?.owner, task?.status, task?.startTime, task?.endTime, isNew]);
+  }, [task?.id, task?.title, task?.description, task?.owner, task?.status, task?.startTime, task?.endTime, isNew]);
 
   const handleTitleClick = () => {
     if (!isNew) {
@@ -72,6 +77,37 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
         setTitleValue(task.title);
       }
       setEditingTitle(false);
+    }
+  };
+
+  const handleDescriptionClick = () => {
+    if (!isNew) {
+      setEditingDescription(true);
+      setTimeout(() => descriptionInputRef.current?.focus(), 0);
+    }
+  };
+
+  const handleDescriptionBlur = () => {
+    if (isNew) {
+      return; // Don't blur for new tasks
+    }
+    setEditingDescription(false);
+    if (task && descriptionValue.trim() !== (task.description || '')) {
+      onUpdate(task.id, { description: descriptionValue.trim() || undefined });
+    } else if (task) {
+      setDescriptionValue(task.description || '');
+    }
+  };
+
+  const handleDescriptionKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      e.currentTarget.blur();
+    } else if (e.key === 'Escape') {
+      if (task) {
+        setDescriptionValue(task.description || '');
+      }
+      setEditingDescription(false);
     }
   };
 
@@ -118,7 +154,7 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
     
     const newTask: Omit<Task, 'id' | 'createdAt'> = {
       title: titleValue.trim(),
-      description: undefined,
+      description: descriptionValue.trim() || undefined,
       completed: statusValue === 'completed',
       status: statusValue,
       startTime: startTimeValue,
@@ -132,6 +168,7 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
 
   const handleCancelNewTask = () => {
     setTitleValue('');
+    setDescriptionValue('');
     setOwnerValue(undefined);
     setStatusValue('not-started');
     setStartTimeValue(undefined);
@@ -154,7 +191,7 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
   const displayTask = task || (isNew ? {
     id: 'temp-new',
     title: titleValue,
-    description: undefined,
+    description: descriptionValue || undefined,
     completed: statusValue === 'completed',
     status: statusValue,
     createdAt: new Date().toISOString(),
@@ -212,6 +249,24 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
             />
           ) : (
             <span className={styles.taskTitle}>{displayTask.title || 'Untitled'}</span>
+          )}
+        </td>
+        <td className={styles.descriptionCell} onClick={handleDescriptionClick}>
+          {editingDescription || isNew ? (
+            <textarea
+              ref={descriptionInputRef}
+              value={descriptionValue}
+              onChange={(e) => setDescriptionValue(e.target.value)}
+              onBlur={handleDescriptionBlur}
+              onKeyDown={handleDescriptionKeyDown}
+              className={styles.descriptionInput}
+              placeholder="Add description (helps AI provide better suggestions)..."
+              rows={2}
+            />
+          ) : (
+            <span className={styles.descriptionText}>
+              {displayTask.description || <span className={styles.placeholderText}>Click to add description</span>}
+            </span>
           )}
         </td>
         <td className={styles.ownerCell}>

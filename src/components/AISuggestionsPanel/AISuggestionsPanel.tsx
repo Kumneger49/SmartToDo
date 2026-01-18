@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Task } from '../../types';
-import { getAISuggestions, AISuggestions } from '../../api/openaiApi';
+import { getAISuggestions, AISuggestions, TaskContext } from '../../api/openaiApi';
 import styles from './AISuggestionsPanel.module.css';
 
 interface AISuggestionsPanelProps {
@@ -16,11 +16,25 @@ const getCacheKey = (taskId: string): string => {
 
 interface CachedSuggestions {
   taskId: string;
-  taskTitle: string;
-  taskDescription?: string;
+  taskContext: TaskContext;
   suggestions: AISuggestions;
   timestamp: string;
 }
+
+const getTaskContextHash = (context: TaskContext): string => {
+  return JSON.stringify({
+    title: context.title,
+    description: context.description,
+    owner: context.owner,
+    status: context.status,
+    startTime: context.startTime,
+    endTime: context.endTime,
+    updatesCount: context.updates?.length || 0,
+    lastUpdateTime: context.updates && context.updates.length > 0 
+      ? context.updates[context.updates.length - 1].timestamp 
+      : undefined,
+  });
+};
 
 export const AISuggestionsPanel = ({ task, onClose }: AISuggestionsPanelProps) => {
   const [suggestions, setSuggestions] = useState<AISuggestions | null>(null);
@@ -29,20 +43,45 @@ export const AISuggestionsPanel = ({ task, onClose }: AISuggestionsPanelProps) =
 
   useEffect(() => {
     loadSuggestions();
-  }, [task.id, task.title, task.description]);
+  }, [
+    task.id, 
+    task.title, 
+    task.description, 
+    task.owner, 
+    task.status, 
+    task.startTime, 
+    task.endTime,
+    task.updates?.length,
+  ]);
 
   const loadSuggestions = async () => {
+    // Build task context
+    const taskContext: TaskContext = {
+      title: task.title,
+      description: task.description,
+      owner: task.owner,
+      status: task.status,
+      startTime: task.startTime,
+      endTime: task.endTime,
+      updates: task.updates?.map(update => ({
+        author: update.author,
+        content: update.content,
+        timestamp: update.timestamp,
+        likes: update.likes,
+      })),
+    };
+
+    const contextHash = getTaskContextHash(taskContext);
+
     // Check cache first
     const cacheKey = getCacheKey(task.id);
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const cachedData: CachedSuggestions = JSON.parse(cached);
-        // Check if task title/description changed
-        if (
-          cachedData.taskTitle === task.title &&
-          cachedData.taskDescription === (task.description || '')
-        ) {
+        // Check if task context changed
+        const cachedHash = getTaskContextHash(cachedData.taskContext);
+        if (cachedHash === contextHash) {
           setSuggestions(cachedData.suggestions);
           return;
         }
@@ -56,14 +95,13 @@ export const AISuggestionsPanel = ({ task, onClose }: AISuggestionsPanelProps) =
     setError(null);
 
     try {
-      const result = await getAISuggestions(task.title, task.description);
+      const result = await getAISuggestions(taskContext);
       setSuggestions(result);
 
       // Cache the result
       const cacheData: CachedSuggestions = {
         taskId: task.id,
-        taskTitle: task.title,
-        taskDescription: task.description,
+        taskContext: taskContext,
         suggestions: result,
         timestamp: new Date().toISOString(),
       };

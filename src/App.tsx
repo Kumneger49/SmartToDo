@@ -67,7 +67,7 @@ function App() {
       <div className={styles.container}>
         <header className={styles.header}>
           <div className={styles.headerTop}>
-            <h1 className={styles.title}>🌟 SmartToDo</h1>
+            <h1 className={styles.title}>BarakaFlow</h1>
             <TodayOverview tasks={tasks} />
           </div>
         </header>

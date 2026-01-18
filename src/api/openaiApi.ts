@@ -16,26 +16,89 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-export const getAISuggestions = async (taskTitle: string, taskDescription?: string): Promise<AISuggestions> => {
+export interface TaskContext {
+  title: string;
+  description?: string;
+  owner?: string;
+  status: 'not-started' | 'pending' | 'completed';
+  startTime?: string;
+  endTime?: string;
+  updates?: Array<{
+    author: string;
+    content: string;
+    timestamp: string;
+    likes: number;
+  }>;
+}
+
+export const getAISuggestions = async (taskContext: TaskContext): Promise<AISuggestions> => {
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY=your_key to your .env file. Note: In Vite, environment variables must be prefixed with VITE_ to be accessible in the client.');
   }
 
-  const taskContext = taskDescription 
-    ? `Task: "${taskTitle}"\nDescription: "${taskDescription}"`
-    : `Task: "${taskTitle}"`;
+  // Format timeline information
+  let timelineInfo = '';
+  if (taskContext.startTime && taskContext.endTime) {
+    const startDate = new Date(taskContext.startTime);
+    const endDate = new Date(taskContext.endTime);
+    const startStr = startDate.toLocaleString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+    const endStr = endDate.toLocaleString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+    timelineInfo = `\nTimeline: ${startStr} - ${endStr}`;
+  }
 
-  const prompt = `For the following task, provide helpful assistance in the following JSON format:
-${taskContext}
+  // Format update history
+  let updatesInfo = '';
+  if (taskContext.updates && taskContext.updates.length > 0) {
+    const recentUpdates = taskContext.updates.slice(-5).map((update, idx) => {
+      const date = new Date(update.timestamp);
+      const dateStr = date.toLocaleString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit' 
+      });
+      return `${idx + 1}. [${dateStr}] ${update.author}: ${update.content}`;
+    }).join('\n');
+    updatesInfo = `\n\nRecent Update History:\n${recentUpdates}`;
+  }
 
-Provide response in JSON format:
+  const taskInfo = `Task Title: "${taskContext.title}"
+${taskContext.description ? `Description: "${taskContext.description}"` : ''}
+Owner: ${taskContext.owner || 'Unassigned'}
+Status: ${taskContext.status}${timelineInfo}${updatesInfo}`;
+
+  const prompt = `You are an expert productivity assistant. Analyze the following task with all its context and provide personalized, specific suggestions.
+
+${taskInfo}
+
+Based on ALL the information provided (title, description, owner, status, timeline, and update history), provide helpful assistance in the following JSON format:
 {
   "tips": ["tip1", "tip2", "tip3"],
   "suggestions": ["suggestion1", "suggestion2", "suggestion3"],
   "approach": "A step-by-step approach on how to tackle this task"
 }
 
-Make the response practical, actionable, and encouraging. Keep tips and suggestions concise (1 sentence each). The approach should be 2-3 sentences. Base your suggestions on both the task title and description if provided.`;
+Guidelines:
+- Make suggestions SPECIFIC to this task, not generic advice
+- Consider the task's current status (${taskContext.status}) when providing advice
+- If there's a timeline, consider time management and scheduling
+- If there are updates, consider the conversation history and context
+- If there's an owner, tailor suggestions for that person
+- Keep tips and suggestions concise (1 sentence each)
+- The approach should be 2-3 sentences
+- Be practical, actionable, and encouraging`;
 
   try {
     const response = await fetch(OPENAI_API_URL, {

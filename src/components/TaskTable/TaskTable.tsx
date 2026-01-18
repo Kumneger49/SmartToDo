@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Task } from '../../types';
 import { TaskRow } from '../TaskRow/TaskRow';
 import { getCurrentUser } from '../../utils/userUtils';
+import { SearchAndFilter, FilterType } from '../SearchAndFilter/SearchAndFilter';
 import styles from './TaskTable.module.css';
 
 interface TaskTableProps {
@@ -13,12 +14,48 @@ interface TaskTableProps {
 
 export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTableProps) => {
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState<FilterType>('all');
   const currentUser = getCurrentUser();
 
-  // Separate tasks into To-Do and Completed
+  // Filter and search tasks
+  const filteredTasks = useMemo(() => {
+    let filtered = tasks;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(task =>
+        task.title.toLowerCase().includes(query) ||
+        (task.description && task.description.toLowerCase().includes(query))
+      );
+    }
+
+    // Apply status filter
+    if (filter === 'completed') {
+      filtered = filtered.filter(t => t.completed);
+    } else if (filter === 'pending') {
+      filtered = filtered.filter(t => !t.completed && t.status === 'pending');
+    } else if (filter === 'not-started') {
+      filtered = filtered.filter(t => !t.completed && t.status === 'not-started');
+    } else if (filter === 'today') {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      filtered = filtered.filter(task => {
+        if (!task.startTime) return false;
+        const taskDate = new Date(task.startTime);
+        const taskDateStr = taskDate.toISOString().split('T')[0];
+        return taskDateStr === todayStr;
+      });
+    }
+
+    return filtered;
+  }, [tasks, searchQuery, filter]);
+
+  // Separate filtered tasks into To-Do and Completed
   const { todoTasks, completedTasks } = useMemo(() => {
-    const todo = tasks.filter(t => !t.completed);
-    const completed = tasks.filter(t => t.completed);
+    const todo = filteredTasks.filter(t => !t.completed);
+    const completed = filteredTasks.filter(t => t.completed);
 
     // Sort by startTime
     const sortByStartTime = (a: Task, b: Task) => {
@@ -32,7 +69,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
       todoTasks: todo.sort(sortByStartTime),
       completedTasks: completed.sort(sortByStartTime),
     };
-  }, [tasks]);
+  }, [filteredTasks]);
 
   const handleCreateNewTask = () => {
     setIsCreatingNew(true);
@@ -55,12 +92,20 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
         </button>
       </div>
 
+      <SearchAndFilter
+        searchQuery={searchQuery}
+        filter={filter}
+        onSearchChange={setSearchQuery}
+        onFilterChange={setFilter}
+      />
+
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
               <th className={styles.checkboxColumn}></th>
               <th className={styles.taskColumn}>Task</th>
+              <th className={styles.descriptionColumn}>Description</th>
               <th className={styles.ownerColumn}>Owner</th>
               <th className={styles.statusColumn}>Status</th>
               <th className={styles.timelineColumn}>Timeline</th>
@@ -85,7 +130,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
             {todoTasks.length > 0 && (
               <>
                 <tr className={styles.sectionRow}>
-                  <td colSpan={8} className={styles.sectionHeader}>
+                  <td colSpan={9} className={styles.sectionHeader}>
                     <span className={styles.sectionTitle}>To-Do</span>
                     <span className={styles.sectionCount}>({todoTasks.length})</span>
                   </td>
@@ -108,7 +153,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
             {completedTasks.length > 0 && (
               <>
                 <tr className={styles.sectionRow}>
-                  <td colSpan={8} className={styles.sectionHeader}>
+                  <td colSpan={9} className={styles.sectionHeader}>
                     <span className={styles.sectionTitle}>Completed</span>
                     <span className={styles.sectionCount}>({completedTasks.length})</span>
                   </td>
@@ -127,10 +172,13 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
               </>
             )}
 
-            {tasks.length === 0 && !isCreatingNew && (
+            {filteredTasks.length === 0 && !isCreatingNew && (
               <tr>
-                <td colSpan={8} className={styles.emptyState}>
-                  No tasks yet. Click "New Task" to get started!
+                <td colSpan={9} className={styles.emptyState}>
+                  {searchQuery || filter !== 'all' 
+                    ? 'No tasks match your search or filter criteria.'
+                    : 'No tasks yet. Click "New Task" to get started!'
+                  }
                 </td>
               </tr>
             )}

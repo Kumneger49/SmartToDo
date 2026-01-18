@@ -38,6 +38,37 @@
   min-width: 200px;
 }
 
+.descriptionCell {
+  padding: 12px 16px;
+  cursor: pointer;
+  min-width: 250px;
+  max-width: 300px;
+}
+
+.descriptionText {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+  display: block;
+}
+
+.descriptionInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  color: #111827;
+  resize: vertical;
+  outline: none;
+  min-height: 40px;
+}
+
+.descriptionInput:focus {
+  border-color: #2563eb;
+}
+
 .taskTitle {
   font-size: 14px;
   color: #111827;
