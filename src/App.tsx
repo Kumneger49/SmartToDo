@@ -59,28 +59,44 @@ function App() {
    */
   const checkAuth = async () => {
     try {
-      if (authApi.isAuthenticated()) {
-        // Verify token is still valid
-        const response = await authApi.verify();
-        setIsAuthenticated(true);
-        // Set current user from verified response
-        setCurrentUser(response.user);
-      } else {
-        // If not authenticated, try to get user from localStorage as fallback
-        const storedUser = authApi.getCurrentUser();
-        if (storedUser) {
-          setCurrentUser(storedUser);
-        }
-      }
-    } catch (error) {
-      // Token invalid or expired - try localStorage as fallback
+      // First, try to get user from localStorage (fast, works even if backend is slow)
       const storedUser = authApi.getCurrentUser();
       if (storedUser) {
-        // User exists in localStorage, set it even if verify failed
-        setCurrentUser(storedUser);
+        // Set user immediately from localStorage for instant UI update
+        setCurrentUser({ name: storedUser.name, email: storedUser.email });
+        setIsAuthenticated(true);
+      }
+
+      // Then verify token with backend (if token exists)
+      if (authApi.isAuthenticated()) {
+        try {
+          const response = await authApi.verify();
+          // Update with fresh data from backend
+          setIsAuthenticated(true);
+          setCurrentUser({ name: response.user.name, email: response.user.email });
+        } catch (verifyError) {
+          // If verify fails but we have localStorage user, keep them logged in
+          // This handles cases where backend is temporarily unavailable
+          if (!storedUser) {
+            // No localStorage user and verify failed - logout
+            authApi.logout();
+            setIsAuthenticated(false);
+            setCurrentUser(null);
+          }
+          // If we have storedUser, keep them logged in (already set above)
+        }
+      } else if (!storedUser) {
+        // No token and no stored user - not authenticated
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+      }
+    } catch (error) {
+      // Fallback: try localStorage one more time
+      const storedUser = authApi.getCurrentUser();
+      if (storedUser) {
+        setCurrentUser({ name: storedUser.name, email: storedUser.email });
         setIsAuthenticated(true);
       } else {
-        // No user found, logout
         authApi.logout();
         setIsAuthenticated(false);
         setCurrentUser(null);
@@ -164,7 +180,7 @@ function App() {
     // Get current user from localStorage (set by authApi)
     const user = authApi.getCurrentUser();
     if (user) {
-      setCurrentUser(user);
+      setCurrentUser({ name: user.name, email: user.email });
     }
   };
 
