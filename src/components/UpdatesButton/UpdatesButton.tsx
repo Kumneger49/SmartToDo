@@ -6,17 +6,20 @@ import styles from './UpdatesButton.module.css';
 interface UpdatesButtonProps {
   task: Task;
   onUpdate: (updates: Task['updates']) => void;
+  disabled?: boolean;
 }
 
-export const UpdatesButton = ({ task, onUpdate }: UpdatesButtonProps) => {
+export const UpdatesButton = ({ task, onUpdate, disabled = false }: UpdatesButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const updateCount = task.updates?.length || 0;
 
   return (
     <>
       <button
-        onClick={() => setIsModalOpen(true)}
-        className={styles.updatesButton}
+        onClick={() => !disabled && setIsModalOpen(true)}
+        className={`${styles.updatesButton} ${disabled ? styles.disabled : ''}`}
+        disabled={disabled}
+        title={disabled ? 'Save the task first to add updates' : 'Write new update'}
       >
         Write new update
         {updateCount > 0 && (

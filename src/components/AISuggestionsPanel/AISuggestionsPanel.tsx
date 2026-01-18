@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Task } from '../../types';
-import { getAISuggestions, AISuggestions, TaskContext } from '../../api/openaiApi';
+import { getAISuggestions, AISuggestions, TaskContext, sendTaskChatMessage, ChatMessage } from '../../api/openaiApi';
+import { ChatInterface } from '../ChatInterface/ChatInterface';
 import styles from './AISuggestionsPanel.module.css';
 
 interface AISuggestionsPanelProps {
@@ -36,10 +37,29 @@ const getTaskContextHash = (context: TaskContext): string => {
   });
 };
 
+const formatInitialMessage = (suggestions: AISuggestions | null): string => {
+  if (!suggestions) return '';
+  
+  let message = '**💡 Tips:**\n';
+  suggestions.tips.forEach(tip => {
+    message += `- ${tip}\n`;
+  });
+  
+  message += '\n**✨ Suggestions:**\n';
+  suggestions.suggestions.forEach(suggestion => {
+    message += `- ${suggestion}\n`;
+  });
+  
+  message += `\n**🎯 Approach:**\n${suggestions.approach}`;
+  
+  return message;
+};
+
 export const AISuggestionsPanel = ({ task, onClose }: AISuggestionsPanelProps) => {
   const [suggestions, setSuggestions] = useState<AISuggestions | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     loadSuggestions();
@@ -125,26 +145,28 @@ export const AISuggestionsPanel = ({ task, onClose }: AISuggestionsPanelProps) =
         </div>
 
         <div className={styles.content}>
-          <div className={styles.taskInfo}>
-            <h4 className={styles.taskTitle}>{task.title}</h4>
-            {task.description && (
-              <p className={styles.taskDescription}>{task.description}</p>
-            )}
-          </div>
+          {!showChat && (
+            <div className={styles.taskInfo}>
+              <h4 className={styles.taskTitle}>{task.title}</h4>
+              {task.description && (
+                <p className={styles.taskDescription}>{task.description}</p>
+              )}
+            </div>
+          )}
 
-          {loading && (
+          {loading && !showChat && (
             <div className={styles.loading}>
               <p>Getting AI suggestions...</p>
             </div>
           )}
 
-          {error && (
+          {error && !showChat && (
             <div className={styles.error}>
               <p>⚠️ {error}</p>
             </div>
           )}
 
-          {suggestions && (
+          {suggestions && !showChat && (
             <div className={styles.suggestions}>
               <div className={styles.section}>
                 <h4 className={styles.sectionTitle}>💡 Tips</h4>
@@ -168,7 +190,43 @@ export const AISuggestionsPanel = ({ task, onClose }: AISuggestionsPanelProps) =
                 <h4 className={styles.sectionTitle}>🎯 Approach</h4>
                 <p className={styles.approach}>{suggestions.approach}</p>
               </div>
+
+              <div className={styles.chatButtonContainer}>
+                <button
+                  onClick={() => setShowChat(true)}
+                  className={styles.chatButton}
+                >
+                  💬 Ask a question
+                </button>
+              </div>
             </div>
+          )}
+
+          {showChat && (
+            <ChatInterface
+              conversationId={`task-${task.id}`}
+              initialMessage={formatInitialMessage(suggestions)}
+              systemPrompt="You are an expert productivity assistant helping with a specific task."
+              contextData={task}
+              onSendMessage={async (message: string, conversationHistory: ChatMessage[]) => {
+                const taskContext: TaskContext = {
+                  title: task.title,
+                  description: task.description,
+                  owner: task.owner,
+                  status: task.status,
+                  startTime: task.startTime,
+                  endTime: task.endTime,
+                  updates: task.updates?.map(update => ({
+                    author: update.author,
+                    content: update.content,
+                    timestamp: update.timestamp,
+                    likes: update.likes,
+                  })),
+                };
+                return await sendTaskChatMessage(taskContext, message, conversationHistory);
+              }}
+              onClearConversation={() => setShowChat(false)}
+            />
           )}
         </div>
       </div>

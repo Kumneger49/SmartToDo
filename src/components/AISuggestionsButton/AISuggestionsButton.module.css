@@ -15,3 +15,18 @@
   background: #bfdbfe;
   border-color: #60a5fa;
 }
+
+.aiButton.disabled,
+.aiButton:disabled {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.aiButton.disabled:hover,
+.aiButton:disabled:hover {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+}

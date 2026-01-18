@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { Task } from '../../types';
+import { Task, RecurrenceFrequency } from '../../types';
 import { OwnerCell } from '../OwnerCell/OwnerCell';
 import { StatusCell } from '../StatusCell/StatusCell';
 import { TimelineCell } from '../TimelineCell/TimelineCell';
 import { UpdatesButton } from '../UpdatesButton/UpdatesButton';
 import { AISuggestionsButton } from '../AISuggestionsButton/AISuggestionsButton';
 import { DeleteConfirmationModal } from '../DeleteConfirmationModal/DeleteConfirmationModal';
+import { RecurrencePicker } from '../RecurrencePicker/RecurrencePicker';
+import { getCurrentUser } from '../../utils/userUtils';
 import styles from './TaskRow.module.css';
 
 interface TaskRowProps {
@@ -18,14 +20,18 @@ interface TaskRowProps {
 }
 
 export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: TaskRowProps) => {
+  const currentUser = getCurrentUser();
   const [editingTitle, setEditingTitle] = useState(isNew);
   const [editingDescription, setEditingDescription] = useState(false);
   const [titleValue, setTitleValue] = useState(task?.title || '');
   const [descriptionValue, setDescriptionValue] = useState(task?.description || '');
-  const [ownerValue, setOwnerValue] = useState(task?.owner);
+  const [ownerValue, setOwnerValue] = useState(task?.owner || (isNew ? currentUser.name : undefined));
   const [statusValue, setStatusValue] = useState<Task['status']>(task?.status || 'not-started');
   const [startTimeValue, setStartTimeValue] = useState(task?.startTime);
   const [endTimeValue, setEndTimeValue] = useState(task?.endTime);
+  const [recurrenceValue, setRecurrenceValue] = useState<RecurrenceFrequency>(
+    task?.recurrence?.frequency || 'none'
+  );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
@@ -45,10 +51,11 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
       setStatusValue(task.status || 'not-started');
       setStartTimeValue(task.startTime);
       setEndTimeValue(task.endTime);
+      setRecurrenceValue(task.recurrence?.frequency || 'none');
       setEditingTitle(false);
       setEditingDescription(false);
     }
-  }, [task?.id, task?.title, task?.description, task?.owner, task?.status, task?.startTime, task?.endTime, isNew]);
+  }, [task?.id, task?.title, task?.description, task?.owner, task?.status, task?.startTime, task?.endTime, task?.recurrence?.frequency, isNew]);
 
   const handleTitleClick = () => {
     if (!isNew) {
@@ -122,10 +129,12 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
   };
 
   const handleOwnerChange = (owner: string | undefined) => {
+    // If owner is undefined, default to current user
+    const finalOwner = owner || currentUser.name;
     if (task) {
-      onUpdate(task.id, { owner });
+      onUpdate(task.id, { owner: finalOwner });
     } else if (isNew) {
-      setOwnerValue(owner);
+      setOwnerValue(finalOwner);
     }
   };
 
@@ -149,6 +158,18 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
     }
   };
 
+  const handleRecurrenceChange = (frequency: RecurrenceFrequency) => {
+    if (task) {
+      onUpdate(task.id, {
+        recurrence: frequency !== 'none' ? {
+          frequency: frequency,
+        } : undefined,
+      });
+    } else if (isNew) {
+      setRecurrenceValue(frequency);
+    }
+  };
+
   const handleSaveNewTask = () => {
     if (!titleValue.trim() || !startTimeValue || !endTimeValue) return;
     
@@ -159,8 +180,11 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
       status: statusValue,
       startTime: startTimeValue,
       endTime: endTimeValue,
-      owner: ownerValue,
+      owner: ownerValue || currentUser.name, // Default to current user
       updates: tempUpdates, // Include any updates made before saving
+      recurrence: recurrenceValue !== 'none' ? {
+        frequency: recurrenceValue,
+      } : undefined,
     };
     onSave(newTask);
     setTempUpdates([]); // Reset temp updates
@@ -197,7 +221,7 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
     createdAt: new Date().toISOString(),
     startTime: startTimeValue,
     endTime: endTimeValue,
-    owner: ownerValue,
+    owner: ownerValue || currentUser.name, // Default to current user
     updates: [],
   } : null);
 
@@ -294,14 +318,22 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
             isNew={isNew}
           />
         </td>
+        <td className={styles.frequencyCell}>
+          <RecurrencePicker
+            frequency={isNew ? recurrenceValue : (displayTask.recurrence?.frequency || 'none')}
+            onChange={handleRecurrenceChange}
+            isNew={isNew}
+          />
+        </td>
         <td className={styles.updatesCell}>
           <UpdatesButton 
             task={{ ...displayTask, updates: isNew ? tempUpdates : displayTask.updates }} 
-            onUpdate={handleUpdatesChange} 
+            onUpdate={handleUpdatesChange}
+            disabled={isNew}
           />
         </td>
         <td className={styles.aiCell}>
-          <AISuggestionsButton task={displayTask} />
+          <AISuggestionsButton task={displayTask} disabled={isNew} />
         </td>
         <td className={styles.actionsCell}>
           {isNew ? (

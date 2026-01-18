@@ -109,6 +109,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
               <th className={styles.ownerColumn}>Owner</th>
               <th className={styles.statusColumn}>Status</th>
               <th className={styles.timelineColumn}>Timeline</th>
+              <th className={styles.frequencyColumn}>Frequency</th>
               <th className={styles.updatesColumn}>Updates</th>
               <th className={styles.aiColumn}>AI Help</th>
               <th className={styles.actionsColumn}></th>
@@ -130,7 +131,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
             {todoTasks.length > 0 && (
               <>
                 <tr className={styles.sectionRow}>
-                  <td colSpan={9} className={styles.sectionHeader}>
+                  <td colSpan={10} className={styles.sectionHeader}>
                     <span className={styles.sectionTitle}>To-Do</span>
                     <span className={styles.sectionCount}>({todoTasks.length})</span>
                   </td>
@@ -153,7 +154,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
             {completedTasks.length > 0 && (
               <>
                 <tr className={styles.sectionRow}>
-                  <td colSpan={9} className={styles.sectionHeader}>
+                  <td colSpan={10} className={styles.sectionHeader}>
                     <span className={styles.sectionTitle}>Completed</span>
                     <span className={styles.sectionCount}>({completedTasks.length})</span>
                   </td>
@@ -174,7 +175,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
 
             {filteredTasks.length === 0 && !isCreatingNew && (
               <tr>
-                <td colSpan={9} className={styles.emptyState}>
+                <td colSpan={10} className={styles.emptyState}>
                   {searchQuery || filter !== 'all' 
                     ? 'No tasks match your search or filter criteria.'
                     : 'No tasks yet. Click "New Task" to get started!'

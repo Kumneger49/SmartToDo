@@ -9,6 +9,8 @@ export interface TaskUpdate {
   likedBy: string[]; // array of owner names who liked
 }
 
+export type RecurrenceFrequency = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly';
+
 export interface Task {
   id: string;
   title: string;
@@ -20,6 +22,11 @@ export interface Task {
   owner?: string; // owner name
   status: 'not-started' | 'pending' | 'completed';
   updates?: TaskUpdate[]; // array of updates
+  recurrence?: {
+    frequency: RecurrenceFrequency;
+    interval?: number; // e.g., every 2 weeks
+    endDate?: string; // ISO string for when recurrence ends
+  };
 }
 
 export interface InvitedMember {

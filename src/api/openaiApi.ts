@@ -11,6 +11,51 @@ export interface DayOptimization {
   actionableSteps: string[];
 }
 
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+// Estimate token count (rough approximation: 1 token ≈ 4 characters)
+const estimateTokens = (text: string): number => {
+  return Math.ceil(text.length / 4);
+};
+
+// Truncate conversation history to stay within token limits
+// Keep system prompt + context + recent messages (within limit)
+const truncateConversation = (
+  systemPrompt: string,
+  contextData: string,
+  messages: ChatMessage[],
+  maxTokens: number = 8000 // Conservative limit for gpt-4o-mini (128k context, but we want to be safe)
+): ChatMessage[] => {
+  const systemTokens = estimateTokens(systemPrompt);
+  const contextTokens = estimateTokens(contextData);
+  const reservedTokens = systemTokens + contextTokens + 500; // Reserve for response
+  const availableTokens = maxTokens - reservedTokens;
+
+  // Start from the most recent messages and work backwards
+  const truncated: ChatMessage[] = [];
+  let currentTokens = 0;
+
+  // Add messages in reverse order (most recent first)
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    const messageTokens = estimateTokens(message.content);
+
+    if (currentTokens + messageTokens <= availableTokens) {
+      truncated.unshift(message); // Add to beginning
+      currentTokens += messageTokens;
+    } else {
+      // If we can't fit this message, stop
+      break;
+    }
+  }
+
+  return truncated;
+};
+
 // Vite only exposes environment variables prefixed with VITE_ to the client
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -76,7 +121,7 @@ export const getAISuggestions = async (taskContext: TaskContext): Promise<AISugg
 
   const taskInfo = `Task Title: "${taskContext.title}"
 ${taskContext.description ? `Description: "${taskContext.description}"` : ''}
-Owner: ${taskContext.owner || 'Unassigned'}
+Owner: ${taskContext.owner || 'You'}
 Status: ${taskContext.status}${timelineInfo}${updatesInfo}`;
 
   const prompt = `You are an expert productivity assistant. Analyze the following task with all its context and provide personalized, specific suggestions.
@@ -253,5 +298,181 @@ Guidelines:
       throw error;
     }
     throw new Error('Failed to get day optimization');
+  }
+};
+
+// Chat conversation for task AI help
+export const sendTaskChatMessage = async (
+  taskContext: TaskContext,
+  userMessage: string,
+  conversationHistory: ChatMessage[]
+): Promise<string> => {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key is not configured.');
+  }
+
+  // Format task context
+  let timelineInfo = '';
+  if (taskContext.startTime && taskContext.endTime) {
+    const startDate = new Date(taskContext.startTime);
+    const endDate = new Date(taskContext.endTime);
+    const startStr = startDate.toLocaleString('en-US', { 
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true 
+    });
+    const endStr = endDate.toLocaleString('en-US', { 
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true 
+    });
+    timelineInfo = `\nTimeline: ${startStr} - ${endStr}`;
+  }
+
+  let updatesInfo = '';
+  if (taskContext.updates && taskContext.updates.length > 0) {
+    const recentUpdates = taskContext.updates.slice(-5).map((update, idx) => {
+      const date = new Date(update.timestamp);
+      const dateStr = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      return `${idx + 1}. [${dateStr}] ${update.author}: ${update.content}`;
+    }).join('\n');
+    updatesInfo = `\n\nRecent Update History:\n${recentUpdates}`;
+  }
+
+  const contextData = `Task Title: "${taskContext.title}"
+${taskContext.description ? `Description: "${taskContext.description}"` : ''}
+Owner: ${taskContext.owner || 'You'}
+Status: ${taskContext.status}${timelineInfo}${updatesInfo}`;
+
+  const systemPrompt = `You are an expert productivity assistant helping with a specific task. You have access to the task's full context including title, description, owner, status, timeline, and update history. Provide specific, actionable advice based on the conversation history and task context.`;
+
+  // Truncate conversation history
+  const truncatedHistory = truncateConversation(systemPrompt, contextData, conversationHistory);
+
+  // Build messages array
+  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    { role: 'system', content: systemPrompt + '\n\nTask Context:\n' + contextData },
+  ];
+
+  // Add conversation history
+  truncatedHistory.forEach(msg => {
+    messages.push({
+      role: msg.role === 'user' ? 'user' : 'assistant',
+      content: msg.content,
+    });
+  });
+
+  // Add current user message
+  messages.push({ role: 'user', content: userMessage });
+
+  try {
+    const response = await fetch(OPENAI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `OpenAI API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('No response from OpenAI API');
+    }
+
+    return content;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to send chat message');
+  }
+};
+
+// Chat conversation for day optimization
+export const sendDayOptimizationChatMessage = async (
+  tasks: Array<{ title: string; description?: string; startTime: string; endTime: string }>,
+  userMessage: string,
+  conversationHistory: ChatMessage[]
+): Promise<string> => {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key is not configured.');
+  }
+
+  // Format tasks for context
+  const tasksList = tasks.map((task, index) => {
+    const startDate = new Date(task.startTime);
+    const endDate = new Date(task.endTime);
+    const startTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    const endTime = endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    const duration = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60));
+    
+    return `${index + 1}. "${task.title}"${task.description ? ` (${task.description})` : ''}
+   Time: ${startTime} - ${endTime} (${duration} minutes)`;
+  }).join('\n\n');
+
+  const contextData = `Today's Schedule:\n${tasksList}`;
+  const systemPrompt = `You are an expert productivity and energy management coach. Analyze the user's schedule for today and provide optimization recommendations focused on breaks, energy management, and maintaining peak performance throughout the day.`;
+
+  // Truncate conversation history
+  const truncatedHistory = truncateConversation(systemPrompt, contextData, conversationHistory);
+
+  // Build messages array
+  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    { role: 'system', content: systemPrompt + '\n\n' + contextData },
+  ];
+
+  // Add conversation history
+  truncatedHistory.forEach(msg => {
+    messages.push({
+      role: msg.role === 'user' ? 'user' : 'assistant',
+      content: msg.content,
+    });
+  });
+
+  // Add current user message
+  messages.push({ role: 'user', content: userMessage });
+
+  try {
+    const response = await fetch(OPENAI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `OpenAI API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('No response from OpenAI API');
+    }
+
+    return content;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to send chat message');
   }
 };

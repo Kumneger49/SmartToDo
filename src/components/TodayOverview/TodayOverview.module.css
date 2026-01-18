@@ -54,6 +54,85 @@
   animation: slideUp 0.3s ease;
 }
 
+.dateSelector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(79, 70, 229, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(79, 70, 229, 0.1);
+  flex-wrap: wrap;
+}
+
+.dateLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  font-family: 'Nunito', sans-serif;
+}
+
+.dateInput {
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.dateInput:focus {
+  border-color: #4f46e5;
+}
+
+.dateDisplay {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4f46e5;
+  font-family: 'Nunito', sans-serif;
+}
+
+.generateButton {
+  padding: 10px 20px;
+  background: #10b981;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.generateButton:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.generateButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.initialMessage {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.initialText {
+  font-size: 16px;
+  color: #6b7280;
+  font-family: 'Nunito', sans-serif;
+  line-height: 1.6;
+}
+
 .closeButton {
   position: absolute;
   top: 16px;
@@ -240,4 +319,38 @@
 
 .content::-webkit-scrollbar-thumb:hover {
   background: #4338ca;
+}
+
+.chatButtonContainer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid rgba(79, 70, 229, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.chatButton {
+  padding: 12px 24px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chatButton:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.chatContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
 }

@@ -34,7 +34,8 @@ function App() {
         taskData.startTime,
         taskData.endTime,
         taskData.owner,
-        taskData.status
+        taskData.status,
+        taskData.recurrence
       );
       // Reload tasks to get proper sorting
       await loadTasks();

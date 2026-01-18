@@ -40,7 +40,15 @@ export const getTasks = (): Promise<Task[]> => {
 };
 
 // Create a new task
-export const createTask = (title: string, description?: string, startTime?: string, endTime?: string, owner?: string, status?: Task['status']): Promise<Task> => {
+export const createTask = (
+  title: string, 
+  description?: string, 
+  startTime?: string, 
+  endTime?: string, 
+  owner?: string, 
+  status?: Task['status'],
+  recurrence?: Task['recurrence']
+): Promise<Task> => {
   const tasks = loadTasks();
   const newTask: Task = {
     id: generateId(),
@@ -53,6 +61,7 @@ export const createTask = (title: string, description?: string, startTime?: stri
     completed: status === 'completed',
     createdAt: new Date().toISOString(),
     updates: [],
+    recurrence: recurrence || undefined,
   };
   tasks.push(newTask);
   saveTasks(tasks);

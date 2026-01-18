@@ -97,7 +97,8 @@ export const OwnerCell = ({ value, onChange, isNew }: OwnerCellProps) => {
   };
 
   const handleClear = () => {
-    onChange(undefined);
+    // When clearing, default back to current user
+    onChange(currentUser.name);
     setIsOpen(false);
   };
 
@@ -116,7 +117,10 @@ export const OwnerCell = ({ value, onChange, isNew }: OwnerCellProps) => {
               <span className={styles.ownerName}>{value}</span>
             </>
           ) : (
-            <span className={styles.placeholder}>Unassigned</span>
+            <>
+              <div className={styles.avatarSmall}>{currentUser.name[0].toUpperCase()}</div>
+              <span className={styles.ownerName}>{currentUser.name}</span>
+            </>
           )}
           <span className={styles.arrow}>▼</span>
         </button>
