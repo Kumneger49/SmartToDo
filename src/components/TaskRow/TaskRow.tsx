@@ -51,11 +51,14 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
       setStatusValue(task.status || 'not-started');
       setStartTimeValue(task.startTime);
       setEndTimeValue(task.endTime);
-      setRecurrenceValue(task.recurrence?.frequency || 'none');
+      // Handle recurrence: if recurrence exists, use its frequency, otherwise 'none'
+      // Also check if recurrence is explicitly null/undefined
+      const recurrenceFreq = task.recurrence?.frequency || 'none';
+      setRecurrenceValue(recurrenceFreq);
       setEditingTitle(false);
       setEditingDescription(false);
     }
-  }, [task?.id, task?.title, task?.description, task?.owner, task?.status, task?.startTime, task?.endTime, task?.recurrence?.frequency, isNew]);
+  }, [task?.id, task?.title, task?.description, task?.owner, task?.status, task?.startTime, task?.endTime, task?.recurrence, isNew]);
 
   const handleTitleClick = () => {
     if (!isNew) {
@@ -160,10 +163,16 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
 
   const handleRecurrenceChange = (frequency: RecurrenceFrequency) => {
     if (task) {
+      // Update local state immediately for responsive UI
+      setRecurrenceValue(frequency);
+      
+      // Send update to backend
+      // If frequency is 'none', set recurrence to null to explicitly remove it
+      // The backend will use $unset to remove the field from the document
       onUpdate(task.id, {
         recurrence: frequency !== 'none' ? {
           frequency: frequency,
-        } : undefined,
+        } : null, // null signals backend to remove the recurrence field
       });
     } else if (isNew) {
       setRecurrenceValue(frequency);

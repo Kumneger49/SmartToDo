@@ -49,14 +49,28 @@
   transform: translateY(-1px);
 }
 
+.headerTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 1;
+  min-width: 200px;
+}
+
 .title {
   font-size: 32px;
   font-weight: 700;
   color: #111827;
   margin: 0;
   letter-spacing: -0.5px;
-  flex: 1;
-  min-width: 200px;
+}
+
+.welcomeText {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  font-family: 'Nunito', sans-serif;
 }
 
 @media (max-width: 600px) {

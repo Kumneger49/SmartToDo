@@ -93,13 +93,23 @@ router.post('/', async (req: AuthRequest, res: express.Response) => {
  * 
  * Only allows updating tasks that belong to authenticated user
  * Returns updated task with validation
+ * Handles null values by removing fields (for recurrence, etc.)
  */
 router.put('/:id', async (req: AuthRequest, res: express.Response) => {
   try {
+    // Prepare update object
+    const updateData: any = { ...req.body };
+    
+    // Handle null values - if recurrence is null, use $unset to remove it
+    if (updateData.recurrence === null || updateData.recurrence === undefined) {
+      updateData.$unset = { recurrence: '' };
+      delete updateData.recurrence;
+    }
+
     // Find and update task, ensuring it belongs to the user
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, userId: req.userId }, // Security check
-      req.body, // Update data
+      updateData, // Update data (may include $unset)
       { new: true, runValidators: true } // Return updated doc and validate
     );
 

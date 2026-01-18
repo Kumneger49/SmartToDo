@@ -26,6 +26,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // User authentication status
   const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Initial auth check status
   const [showSignup, setShowSignup] = useState(false); // Toggle between login/signup screens
+  const [currentUser, setCurrentUser] = useState<{ name: string; email?: string } | null>(null); // Current authenticated user
 
   /**
    * Check authentication status on component mount
@@ -53,13 +54,16 @@ function App() {
     try {
       if (authApi.isAuthenticated()) {
         // Verify token is still valid
-        await authApi.verify();
+        const response = await authApi.verify();
         setIsAuthenticated(true);
+        // Set current user from verified response
+        setCurrentUser(response.user);
       }
     } catch (error) {
       // Token invalid or expired
       authApi.logout();
       setIsAuthenticated(false);
+      setCurrentUser(null);
     } finally {
       setIsCheckingAuth(false);
     }
@@ -136,6 +140,11 @@ function App() {
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     setShowSignup(false);
+    // Get current user from localStorage (set by authApi)
+    const user = authApi.getCurrentUser();
+    if (user) {
+      setCurrentUser(user);
+    }
   };
 
   /**
@@ -146,6 +155,7 @@ function App() {
     authApi.logout();
     setIsAuthenticated(false);
     setTasks([]);
+    setCurrentUser(null);
   };
 
   // Show loading while checking auth
@@ -178,7 +188,14 @@ function App() {
       <div className={styles.container}>
         <header className={styles.header}>
           <div className={styles.headerTop}>
-            <h1 className={styles.title}>BarakaFlow</h1>
+            <div className={styles.headerTitle}>
+              <h1 className={styles.title}>BarakaFlow</h1>
+              {currentUser && (
+                <span className={styles.welcomeText}>
+                  Welcome, {currentUser.name}! 👋
+                </span>
+              )}
+            </div>
             <div className={styles.headerActions}>
               <TodayOverview tasks={tasks} />
               <button onClick={handleLogout} className={styles.logoutButton}>
