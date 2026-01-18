@@ -1,0 +1,117 @@
+.taskTable {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tableHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.newTaskButton {
+  padding: 8px 16px;
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.newTaskButton:hover {
+  background: #2563eb;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Nunito', sans-serif;
+}
+
+.table thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.checkboxColumn {
+  width: 40px;
+}
+
+.taskColumn {
+  min-width: 200px;
+}
+
+.ownerColumn {
+  min-width: 120px;
+}
+
+.statusColumn {
+  min-width: 140px;
+}
+
+.timelineColumn {
+  min-width: 200px;
+}
+
+.updatesColumn {
+  min-width: 100px;
+}
+
+.aiColumn {
+  min-width: 100px;
+}
+
+.actionsColumn {
+  width: 60px;
+}
+
+.sectionRow {
+  background: #f3f4f6;
+}
+
+.sectionHeader {
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #374151;
+  border-top: 2px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.sectionCount {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.emptyState {
+  padding: 40px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}

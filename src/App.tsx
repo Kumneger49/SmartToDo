@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Task } from './types';
-import { Filter, FilterStatus } from './components/Filter/Filter';
-import { TaskForm } from './components/TaskForm/TaskForm';
-import { TaskList } from './components/TaskList/TaskList';
-import { EmptyState } from './components/EmptyState/EmptyState';
 import { TodayOverview } from './components/TodayOverview/TodayOverview';
+import { TaskTable } from './components/TaskTable/TaskTable';
 import { getTasks, createTask, updateTask, deleteTask } from './api/mockApi';
 import styles from './App.module.css';
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [filter, setFilter] = useState<FilterStatus>('all');
   const [loading, setLoading] = useState(true);
 
   // Load tasks on mount
@@ -30,31 +26,28 @@ function App() {
     }
   };
 
-  const handleCreateTask = async (title: string, description?: string, startTime?: string, endTime?: string) => {
+  const handleCreateTask = async (taskData: Omit<Task, 'id' | 'createdAt'>) => {
     try {
-      const newTask = await createTask(title, description, startTime, endTime);
-      setTasks([...tasks, newTask]);
+      const newTask = await createTask(
+        taskData.title,
+        taskData.description,
+        taskData.startTime,
+        taskData.endTime,
+        taskData.owner,
+        taskData.status
+      );
+      // Reload tasks to get proper sorting
+      await loadTasks();
     } catch (error) {
       console.error('Failed to create task:', error);
     }
   };
 
-  const handleToggleTask = async (id: string) => {
+  const handleUpdateTask = async (id: string, updates: Partial<Task>) => {
     try {
-      const task = tasks.find((t) => t.id === id);
-      if (task) {
-        const updatedTask = await updateTask(id, { completed: !task.completed });
-        setTasks(tasks.map((t) => (t.id === id ? updatedTask : t)));
-      }
-    } catch (error) {
-      console.error('Failed to toggle task:', error);
-    }
-  };
-
-  const handleUpdateTask = async (id: string, title: string, description?: string, startTime?: string, endTime?: string) => {
-    try {
-      const updatedTask = await updateTask(id, { title, description: description || undefined, startTime: startTime || undefined, endTime: endTime || undefined });
-      setTasks(tasks.map((t) => (t.id === id ? updatedTask : t)));
+      await updateTask(id, updates);
+      // Reload tasks to ensure consistency
+      await loadTasks();
     } catch (error) {
       console.error('Failed to update task:', error);
     }
@@ -69,23 +62,6 @@ function App() {
     }
   };
 
-  const handleEmptyStateAdd = () => {
-    // Focus on the input field when user clicks "Add Your First Task"
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-    if (input) {
-      input.focus();
-    }
-  };
-
-  // Filter tasks based on selected filter
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === 'active') return !task.completed;
-    if (filter === 'completed') return task.completed;
-    return true;
-  });
-
-  const allTasksEmpty = tasks.length === 0;
-
   return (
     <div className={styles.app}>
       <div className={styles.container}>
@@ -94,32 +70,16 @@ function App() {
             <h1 className={styles.title}>🌟 SmartToDo</h1>
             <TodayOverview tasks={tasks} />
           </div>
-          <p className={styles.summary}>
-            Organize your tasks with AI-powered suggestions. Get helpful tips, actionable suggestions, 
-            and step-by-step approaches for each task to boost your productivity! 🤖✨
-          </p>
         </header>
-
-        <TaskForm onSubmit={handleCreateTask} />
-
-        {!loading && !allTasksEmpty && (
-          <Filter filter={filter} onChange={setFilter} tasks={tasks} />
-        )}
 
         {loading ? (
           <div className={styles.loading}>Loading your tasks...</div>
-        ) : allTasksEmpty ? (
-          <EmptyState onAddTask={handleEmptyStateAdd} />
-        ) : filteredTasks.length === 0 ? (
-          <div className={styles.noResults}>
-            <p>No {filter === 'active' ? 'active' : 'completed'} tasks found! 🎉</p>
-          </div>
         ) : (
-          <TaskList
-            tasks={filteredTasks}
-            onToggle={handleToggleTask}
+          <TaskTable
+            tasks={tasks}
             onUpdate={handleUpdateTask}
             onDelete={handleDeleteTask}
+            onCreateTask={handleCreateTask}
           />
         )}
       </div>

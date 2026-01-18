@@ -11,7 +11,13 @@ const generateId = (): string => {
 const loadTasks = (): Task[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const tasks = stored ? JSON.parse(stored) : [];
+    // Ensure all tasks have required fields
+    return tasks.map((task: Task) => ({
+      ...task,
+      status: task.status || (task.completed ? 'completed' : 'not-started'),
+      updates: task.updates || [],
+    }));
   } catch (error) {
     console.error('Failed to load tasks from localStorage:', error);
     return [];
@@ -34,7 +40,7 @@ export const getTasks = (): Promise<Task[]> => {
 };
 
 // Create a new task
-export const createTask = (title: string, description?: string, startTime?: string, endTime?: string): Promise<Task> => {
+export const createTask = (title: string, description?: string, startTime?: string, endTime?: string, owner?: string, status?: Task['status']): Promise<Task> => {
   const tasks = loadTasks();
   const newTask: Task = {
     id: generateId(),
@@ -42,8 +48,11 @@ export const createTask = (title: string, description?: string, startTime?: stri
     description: description?.trim() || undefined,
     startTime: startTime || undefined,
     endTime: endTime || undefined,
-    completed: false,
+    owner: owner || undefined,
+    status: status || 'not-started',
+    completed: status === 'completed',
     createdAt: new Date().toISOString(),
+    updates: [],
   };
   tasks.push(newTask);
   saveTasks(tasks);

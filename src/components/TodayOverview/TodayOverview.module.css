@@ -1,28 +1,28 @@
 .button {
   padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: #10b981;
+  border: 2px solid #059669;
+  border-radius: 8px;
   color: #ffffff;
   font-size: 16px;
   font-weight: 600;
   font-family: 'Nunito', sans-serif;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  white-space: nowrap;
 }
 
 .button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background: #059669;
+  border-color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
 }
 
 .button:active {
   transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
 }
 
 .overlay {
@@ -68,7 +68,7 @@
   justify-content: center;
   cursor: pointer;
   font-size: 20px;
-  color: #333;
+  color: #111827;
   transition: all 0.2s ease;
   font-family: 'Nunito', sans-serif;
 }
@@ -93,7 +93,7 @@
 
 .vacationText {
   font-size: 20px;
-  color: #666;
+  color: #374151;
   margin: 0;
   font-family: 'Nunito', sans-serif;
   font-weight: 500;
@@ -104,7 +104,7 @@
   text-align: center;
   padding: 40px 20px;
   font-size: 18px;
-  color: #666;
+  color: #374151;
   font-family: 'Nunito', sans-serif;
 }
 
@@ -113,7 +113,7 @@
 }
 
 .optimization {
-  color: #333;
+  color: #111827;
 }
 
 .title {
@@ -136,7 +136,7 @@
 .sectionTitle {
   font-size: 20px;
   font-weight: 700;
-  color: #333;
+  color: #111827;
   margin: 0 0 12px 0;
   font-family: 'Nunito', sans-serif;
   display: flex;
@@ -147,7 +147,7 @@
 .summaryText {
   font-size: 16px;
   line-height: 1.6;
-  color: #555;
+  color: #374151;
   margin: 0;
   font-family: 'Nunito', sans-serif;
   background: rgba(79, 70, 229, 0.05);
@@ -165,7 +165,7 @@
 .listItem {
   font-size: 15px;
   line-height: 1.6;
-  color: #555;
+  color: #374151;
   margin-bottom: 10px;
   padding-left: 24px;
   position: relative;
@@ -194,7 +194,7 @@
 .footerText {
   font-size: 15px;
   line-height: 1.6;
-  color: #666;
+  color: #374151;
   margin: 0;
   font-family: 'Nunito', sans-serif;
   background: rgba(79, 70, 229, 0.05);

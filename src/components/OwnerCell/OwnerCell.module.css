@@ -1,0 +1,223 @@
+.ownerCell {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.ownerButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+  color: #111827;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.ownerButton:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.ownerButton:disabled {
+  cursor: default;
+}
+
+.ownerName {
+  font-weight: 500;
+}
+
+.placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.arrow {
+  font-size: 10px;
+  color: #6b7280;
+  margin-left: auto;
+}
+
+.avatarSmall {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.dropdown {
+  position: fixed;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  min-width: 280px;
+  padding: 8px;
+}
+
+.suggestedSection,
+.membersSection {
+  margin-bottom: 8px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  padding: 8px 12px 4px;
+  letter-spacing: 0.5px;
+}
+
+.ownerOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  text-align: left;
+  color: #111827;
+  transition: background 0.2s;
+}
+
+.ownerOption:hover {
+  background: #f3f4f6;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.inviteButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  text-align: left;
+  color: #3b82f6;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+
+.inviteButton:hover {
+  background: #eff6ff;
+}
+
+.inviteIcon {
+  font-size: 16px;
+}
+
+.inviteForm {
+  padding: 8px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+
+.emailInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  margin-bottom: 8px;
+  outline: none;
+}
+
+.emailInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.inviteActions {
+  display: flex;
+  gap: 8px;
+}
+
+.inviteSubmitButton,
+.inviteCancelButton {
+  flex: 1;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+}
+
+.inviteSubmitButton {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.inviteSubmitButton:hover {
+  background: #2563eb;
+}
+
+.inviteCancelButton {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.inviteCancelButton:hover {
+  background: #e5e7eb;
+}
+
+.clearButton {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  color: #ef4444;
+  margin-top: 4px;
+  transition: background 0.2s;
+}
+
+.clearButton:hover {
+  background: #fef2f2;
+}

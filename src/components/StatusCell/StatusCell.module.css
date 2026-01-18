@@ -1,0 +1,74 @@
+.statusCell {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.statusButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.statusButton:hover:not(:disabled) {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.statusButton:disabled {
+  cursor: default;
+}
+
+.arrow {
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+.dropdown {
+  position: fixed;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  min-width: 180px;
+  padding: 4px;
+}
+
+.statusOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  text-align: left;
+  color: #111827;
+  transition: background 0.2s;
+}
+
+.statusOption:hover {
+  background: #f3f4f6;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
