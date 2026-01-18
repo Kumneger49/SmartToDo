@@ -16,11 +16,11 @@ export const connectDB = async (): Promise<void> => {
     console.log(`🔍 MONGODB_URI from env: ${process.env.MONGODB_URI ? 'Set' : 'Not set'}`);
     
     // Set connection options for Atlas
-    const options: mongoose.ConnectOptions = {
+    const options = {
       serverSelectionTimeoutMS: 30000, // 30 seconds for Atlas
       socketTimeoutMS: 45000,
       retryWrites: true,
-      w: 'majority',
+      w: 'majority' as const,
     };
     
     await mongoose.connect(mongoURI, options);

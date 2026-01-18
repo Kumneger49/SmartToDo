@@ -53,7 +53,7 @@ router.post(
         { expiresIn: '7d' }
       );
 
-      res.status(201).json({
+      return res.status(201).json({
         message: 'User registered successfully',
         token,
         user: {
@@ -64,7 +64,7 @@ router.post(
       });
     } catch (error: any) {
       console.error('Registration error:', error);
-      res.status(500).json({ error: error.message || 'Failed to register user' });
+      return res.status(500).json({ error: error.message || 'Failed to register user' });
     }
   }
 );
@@ -109,7 +109,7 @@ router.post(
         { expiresIn: '7d' }
       );
 
-      res.json({
+      return res.json({
         message: 'Login successful',
         token,
         user: {
@@ -120,7 +120,7 @@ router.post(
       });
     } catch (error: any) {
       console.error('Login error:', error);
-      res.status(500).json({ error: error.message || 'Failed to login' });
+      return res.status(500).json({ error: error.message || 'Failed to login' });
     }
   }
 );
@@ -148,7 +148,7 @@ router.get('/verify', async (req: express.Request, res: express.Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json({
+    return res.json({
       user: {
         id: user._id.toString(),
         email: user.email,
@@ -157,9 +157,9 @@ router.get('/verify', async (req: express.Request, res: express.Response) => {
     });
   } catch (error: any) {
     if (error instanceof jwt.JsonWebTokenError) {
-      res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: 'Invalid token' });
     } else {
-      res.status(500).json({ error: error.message || 'Failed to verify token' });
+      return res.status(500).json({ error: error.message || 'Failed to verify token' });
     }
   }
 });

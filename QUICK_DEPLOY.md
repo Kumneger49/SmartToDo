@@ -2,27 +2,29 @@
 
 ## TL;DR - Deploy in 3 Steps
 
-### 1️⃣ Deploy Backend (Railway)
+### 1️⃣ Deploy Backend (Render)
 
 ```bash
-# Go to railway.app → New Project → Deploy from GitHub
+# Go to render.com → New + → Web Service
 # Set these environment variables:
-MONGODB_URI=your-mongodb-atlas-uri
-JWT_SECRET=generate-with: openssl rand -base64 32
+MONGODB_URI=mongodb+srv://kumneger496235_db_user:****@smarttodo.a4vchmb.mongodb.net/barakaflow?retryWrites=true&w=majority
+JWT_SECRET=naffBnJaHoTTUo/z1emQQ38XVINK5Knj28Jniz1WufY=
 NODE_ENV=production
 CORS_ORIGIN=https://your-frontend.vercel.app
 ```
 
-**Root Directory:** `server`  
+**Root Directory:** `server` ⚠️ **IMPORTANT**  
 **Build:** `npm install && npm run build`  
 **Start:** `npm start`
+
+📖 **See `DEPLOY_TO_RENDER.md` for detailed steps**
 
 ### 2️⃣ Deploy Frontend (Vercel)
 
 ```bash
 # Go to vercel.com → Add Project → Import from GitHub
 # Set these environment variables:
-VITE_API_URL=https://your-backend.railway.app/api
+VITE_API_URL=https://your-backend.onrender.com/api
 VITE_OPENAI_API_KEY=your-openai-key
 ```
 
@@ -32,7 +34,7 @@ VITE_OPENAI_API_KEY=your-openai-key
 
 ### 3️⃣ Update CORS
 
-Go back to Railway → Update `CORS_ORIGIN` = your Vercel URL
+Go back to Render → Update `CORS_ORIGIN` = your Vercel URL
 
 **Done! 🎉**
 

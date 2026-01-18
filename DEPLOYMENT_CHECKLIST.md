@@ -20,7 +20,7 @@ openssl rand -base64 32
 
 #### Frontend (.env - DO NOT COMMIT)
 ```env
-VITE_API_URL=https://your-backend-domain.railway.app/api
+VITE_API_URL=https://your-backend-domain.onrender.com/api
 VITE_OPENAI_API_KEY=your-openai-api-key
 ```
 
@@ -58,26 +58,32 @@ npm start
 
 ### Step 1: Deploy Backend First
 
-**Recommended: Railway.app**
+**Using: Render.com** ⭐
 
-1. Go to https://railway.app
+**📖 See `DEPLOY_TO_RENDER.md` for detailed step-by-step instructions**
+
+Quick steps:
+1. Go to https://render.com
 2. Sign up/login with GitHub
-3. Click "New Project" → "Deploy from GitHub"
-4. Select your repository
+3. Click "New +" → "Web Service"
+4. Connect your GitHub repository
 5. **Configure:**
-   - Root Directory: `server`
+   - Name: `barakaflow-backend`
+   - Root Directory: `server` ⚠️ **IMPORTANT**
    - Build Command: `npm install && npm run build`
    - Start Command: `npm start`
 6. **Add Environment Variables:**
    - `NODE_ENV` = `production`
-   - `MONGODB_URI` = (your MongoDB Atlas connection string)
-   - `JWT_SECRET` = (generated secret)
+   - `MONGODB_URI` = `mongodb+srv://kumneger496235_db_user:EON63IcQS2rE5XJC@smarttodo.a4vchmb.mongodb.net/barakaflow?retryWrites=true&w=majority&appName=smartToDo`
+   - `JWT_SECRET` = `naffBnJaHoTTUo/z1emQQ38XVINK5Knj28Jniz1WufY=`
    - `CORS_ORIGIN` = (will add after frontend deployment)
-   - `PORT` = (Railway sets this automatically)
-7. **Deploy** and wait for it to start
-8. **Copy your Railway URL** (e.g., `https://barakaflow-backend.railway.app`)
+   - `PORT` = (Render sets this automatically, or use `10000`)
+7. **Deploy** and wait for it to start (2-5 minutes)
+8. **Copy your Render URL** (e.g., `https://barakaflow-backend.onrender.com`)
 
-**Alternative: Render.com**
+**⚠️ Note:** Render free tier spins down after 15 min inactivity (takes ~30 sec to wake up)
+
+**Alternative: Railway.app** (if you have credits)
 - Similar process, but use "New Web Service"
 - Build: `cd server && npm install && npm run build`
 - Start: `cd server && npm start`
@@ -154,7 +160,7 @@ npm start
 ## Quick Reference
 
 ### Backend URLs
-- Health Check: `https://your-backend.railway.app/api/health`
+- Health Check: `https://your-backend.onrender.com/api/health`
 - Should return: `{"status":"ok","message":"BarakaFlow API is running"}`
 
 ### Frontend URLs
