@@ -25,7 +25,7 @@ Fill in the following settings:
 - **Branch:** `main` (or your default branch)
 - **Root Directory:** `server` ⚠️ **IMPORTANT: Set this to `server`**
 - **Runtime:** `Node`
-- **Build Command:** `npm install && npm run build`
+- **Build Command:** `npm install --include=dev && npm run build`
 - **Start Command:** `npm start`
 
 **Environment:**
