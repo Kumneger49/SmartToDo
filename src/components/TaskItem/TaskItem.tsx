@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Task } from '../../types';
 import { DeleteConfirmationModal } from '../DeleteConfirmationModal/DeleteConfirmationModal';
 import { AISuggestions } from '../AISuggestions/AISuggestions';
-import { StartEndTimePicker } from '../StartEndTimePicker/StartEndTimePicker';
+// StartEndTimePicker was removed - this component is deprecated
 import styles from './TaskItem.module.css';
 
 interface TaskItemProps {
@@ -54,7 +54,7 @@ export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
-  const [editDate, setEditDate] = useState<string | undefined>(
+  const [_editDate, setEditDate] = useState<string | undefined>(
     task.startTime ? getDateFromISO(task.startTime) : undefined
   );
   const [editStartTime, setEditStartTime] = useState(task.startTime || '');
@@ -176,14 +176,7 @@ export const TaskItem = ({ task, onToggle, onUpdate, onDelete }: TaskItemProps) 
             />
             <div className={styles.editDateTimeSection}>
               <label className={styles.editDateTimeLabel}>Schedule for:</label>
-              <StartEndTimePicker
-                date={editDate}
-                startTime={editStartTime || undefined}
-                endTime={editEndTime || undefined}
-                onDateChange={setEditDate}
-                onStartTimeChange={(iso) => setEditStartTime(iso || '')}
-                onEndTimeChange={(iso) => setEditEndTime(iso || '')}
-              />
+              <p className={styles.note}>Note: Use the table view to edit task timelines.</p>
             </div>
             <div className={styles.editActions}>
               <button onClick={handleSave} className={styles.saveButton}>

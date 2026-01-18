@@ -76,7 +76,7 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
     }
   };
 
-  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.currentTarget.blur();
     } else if (e.key === 'Escape') {
@@ -106,7 +106,7 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
     }
   };
 
-  const handleDescriptionKeyDown = (e: React.KeyboardEvent) => {
+  const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       e.currentTarget.blur();

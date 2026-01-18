@@ -28,7 +28,11 @@ export const AISuggestions = ({ taskTitle, taskDescription }: AISuggestionsProps
     setIsExpanded(true);
 
     try {
-      const data = await getAISuggestions(taskTitle, taskDescription);
+      const data = await getAISuggestions({
+        title: taskTitle,
+        description: taskDescription,
+        status: 'not-started',
+      });
       setSuggestions(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load AI suggestions');

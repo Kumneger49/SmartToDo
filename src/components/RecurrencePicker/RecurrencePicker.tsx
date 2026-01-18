@@ -9,7 +9,7 @@ interface RecurrencePickerProps {
   isNew?: boolean;
 }
 
-export const RecurrencePicker = ({ frequency, onChange, isNew }: RecurrencePickerProps) => {
+export const RecurrencePicker = ({ frequency, onChange, isNew: _isNew }: RecurrencePickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Task } from '../../types';
 import { getDayOptimization, DayOptimization, sendDayOptimizationChatMessage, ChatMessage } from '../../api/openaiApi';
 import { ChatInterface } from '../ChatInterface/ChatInterface';
@@ -38,8 +38,8 @@ export const TodayOverview = ({ tasks }: TodayOverviewProps) => {
     return getDateString(new Date());
   };
 
-  // Load cached optimization for today
-  const loadCachedOptimization = (): DayOptimization | null => {
+  // Load cached optimization for today (unused but kept for future use)
+  const _loadCachedOptimization = (): DayOptimization | null => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {

@@ -22,7 +22,7 @@ const formatDateTime = (isoString: string): string => {
   return `${dateStr} ${timeStr}`;
 };
 
-export const TimelineCell = ({ startTime, endTime, onChange, isNew }: TimelineCellProps) => {
+export const TimelineCell = ({ startTime, endTime, onChange, isNew: _isNew }: TimelineCellProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<string>('');
   const [startHour, setStartHour] = useState('1');

@@ -21,8 +21,8 @@ interface ChatInterfaceProps {
 export const ChatInterface = ({
   conversationId,
   initialMessage,
-  systemPrompt,
-  contextData,
+  systemPrompt: _systemPrompt,
+  contextData: _contextData,
   onSendMessage,
   onClearConversation,
 }: ChatInterfaceProps) => {

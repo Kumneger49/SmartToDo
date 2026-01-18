@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// useState removed - not used in this component
 import styles from './SearchAndFilter.module.css';
 
 export type FilterType = 'all' | 'completed' | 'pending' | 'not-started' | 'today';

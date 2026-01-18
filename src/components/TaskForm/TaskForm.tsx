@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { StartEndTimePicker } from '../StartEndTimePicker/StartEndTimePicker';
+// StartEndTimePicker was removed - this component is deprecated
 import styles from './TaskForm.module.css';
 
 interface TaskFormProps {
@@ -78,33 +78,9 @@ export const TaskForm = ({ onSubmit }: TaskFormProps) => {
         />
       )}
       
+      {/* Date/time picker removed - use TaskTable for new tasks */}
       <div className={styles.dateTimeSection}>
-        <div className={styles.dateTimePicker}>
-          <label className={styles.dateTimeLabel}>
-            When do you want to do this task? (Required)
-          </label>
-          <StartEndTimePicker
-            date={date}
-            startTime={startTime}
-            endTime={endTime}
-            onDateChange={setDate}
-            onStartTimeChange={setStartTime}
-            onEndTimeChange={setEndTime}
-          />
-          {date && (
-            <button
-              type="button"
-              onClick={() => {
-                setDate(undefined);
-                setStartTime(undefined);
-                setEndTime(undefined);
-              }}
-              className={styles.clearDateTimeButton}
-            >
-              Clear
-            </button>
-          )}
-        </div>
+        <p className={styles.note}>Note: This form is deprecated. Use the table view to create tasks.</p>
       </div>
 
       <button 

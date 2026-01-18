@@ -15,7 +15,7 @@ const statusOptions: Array<{ value: Task['status']; label: string; color: string
   { value: 'completed', label: 'Completed', color: '#10b981' },
 ];
 
-export const StatusCell = ({ value, onChange, isNew }: StatusCellProps) => {
+export const StatusCell = ({ value, onChange, isNew: _isNew }: StatusCellProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);

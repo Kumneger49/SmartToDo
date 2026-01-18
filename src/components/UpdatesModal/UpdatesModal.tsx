@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Task, TaskUpdate } from '../../types';
 import { getCurrentUser, getAvailableOwners } from '../../utils/userUtils';
 import styles from './UpdatesModal.module.css';
@@ -236,7 +236,7 @@ interface UpdateItemProps {
   isLiked: boolean;
 }
 
-const UpdateItem = ({ update, currentUser, onReply, onLike, isLiked }: UpdateItemProps) => {
+const UpdateItem = ({ update, currentUser: _currentUser, onReply, onLike, isLiked }: UpdateItemProps) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyContent, setReplyContent] = useState('');
 

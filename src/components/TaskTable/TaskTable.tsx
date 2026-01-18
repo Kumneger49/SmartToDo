@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Task } from '../../types';
 import { TaskRow } from '../TaskRow/TaskRow';
-import { getCurrentUser } from '../../utils/userUtils';
+// getCurrentUser removed - not used in this component
 import { SearchAndFilter, FilterType } from '../SearchAndFilter/SearchAndFilter';
 import styles from './TaskTable.module.css';
 
@@ -16,7 +16,7 @@ export const TaskTable = ({ tasks, onUpdate, onDelete, onCreateTask }: TaskTable
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
-  const currentUser = getCurrentUser();
+  // currentUser removed - not used in this component
 
   // Filter and search tasks
   const filteredTasks = useMemo(() => {

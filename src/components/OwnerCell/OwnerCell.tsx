@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { getCurrentUser, getInvitedMembers, addInvitedMember, getAvailableOwners } from '../../utils/userUtils';
+import { getCurrentUser, addInvitedMember, getAvailableOwners } from '../../utils/userUtils';
 import styles from './OwnerCell.module.css';
 
 interface OwnerCellProps {
@@ -9,7 +9,7 @@ interface OwnerCellProps {
   isNew?: boolean;
 }
 
-export const OwnerCell = ({ value, onChange, isNew }: OwnerCellProps) => {
+export const OwnerCell = ({ value, onChange, isNew: _isNew }: OwnerCellProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showInviteInput, setShowInviteInput] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');

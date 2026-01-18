@@ -7,18 +7,6 @@ interface MessageBubbleProps {
 
 // Simple markdown-like rendering for bold, italic, lists, and code
 const renderMarkdown = (text: string): JSX.Element => {
-  const parts: (string | JSX.Element)[] = [];
-  let currentIndex = 0;
-  
-  // Match bold **text**
-  const boldRegex = /\*\*(.+?)\*\*/g;
-  // Match italic *text*
-  const italicRegex = /\*(.+?)\*/g;
-  // Match code `text`
-  const codeRegex = /`(.+?)`/g;
-  // Match bullet points
-  const bulletRegex = /^[-•]\s+(.+)$/gm;
-  
   // Split by newlines to handle lists
   const lines = text.split('\n');
   
