@@ -16,6 +16,7 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+PRODUCTION_SECRETS.md
 
 # Editor directories and files
 .vscode/*
