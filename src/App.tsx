@@ -43,8 +43,15 @@ function App() {
   useEffect(() => {
     if (isAuthenticated) {
       loadTasks();
+      // Ensure currentUser is set if authenticated but not yet set
+      if (!currentUser) {
+        const user = authApi.getCurrentUser();
+        if (user) {
+          setCurrentUser(user);
+        }
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentUser]);
 
   /**
    * Verify user authentication token
@@ -58,12 +65,26 @@ function App() {
         setIsAuthenticated(true);
         // Set current user from verified response
         setCurrentUser(response.user);
+      } else {
+        // If not authenticated, try to get user from localStorage as fallback
+        const storedUser = authApi.getCurrentUser();
+        if (storedUser) {
+          setCurrentUser(storedUser);
+        }
       }
     } catch (error) {
-      // Token invalid or expired
-      authApi.logout();
-      setIsAuthenticated(false);
-      setCurrentUser(null);
+      // Token invalid or expired - try localStorage as fallback
+      const storedUser = authApi.getCurrentUser();
+      if (storedUser) {
+        // User exists in localStorage, set it even if verify failed
+        setCurrentUser(storedUser);
+        setIsAuthenticated(true);
+      } else {
+        // No user found, logout
+        authApi.logout();
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+      }
     } finally {
       setIsCheckingAuth(false);
     }
