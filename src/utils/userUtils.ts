@@ -15,6 +15,14 @@ export interface InvitedMember {
 // Get current user
 export const getCurrentUser = (): User => {
   try {
+    // First try to get from auth API (if logged in)
+    const authUser = localStorage.getItem('current_user');
+    if (authUser) {
+      const user = JSON.parse(authUser);
+      return { name: user.name || 'You', email: user.email };
+    }
+    
+    // Fallback to old storage
     const stored = localStorage.getItem(USER_STORAGE_KEY);
     if (stored) {
       return JSON.parse(stored);
