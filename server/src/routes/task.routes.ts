@@ -100,7 +100,7 @@ router.put('/:id', async (req: AuthRequest, res: express.Response) => {
     // Prepare update object
     const updateData: any = { ...req.body };
     
-    // Handle null values - if recurrence is null, use $unset to remove it
+    // Handle undefined/null values - if recurrence is undefined/null, use $unset to remove it
     if (updateData.recurrence === null || updateData.recurrence === undefined) {
       updateData.$unset = { recurrence: '' };
       delete updateData.recurrence;

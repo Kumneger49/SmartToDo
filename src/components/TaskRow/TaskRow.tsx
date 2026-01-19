@@ -167,12 +167,12 @@ export const TaskRow = ({ task, isNew, onSave, onCancel, onUpdate, onDelete }: T
       setRecurrenceValue(frequency);
       
       // Send update to backend
-      // If frequency is 'none', set recurrence to null to explicitly remove it
+      // If frequency is 'none', set recurrence to undefined to explicitly remove it
       // The backend will use $unset to remove the field from the document
       onUpdate(task.id, {
         recurrence: frequency !== 'none' ? {
           frequency: frequency,
-        } : null, // null signals backend to remove the recurrence field
+        } : undefined, // undefined signals backend to remove the recurrence field
       });
     } else if (isNew) {
       setRecurrenceValue(frequency);

@@ -220,6 +220,24 @@ function App() {
   }
 
   // Show main app if authenticated
+  // Get user name directly from localStorage - simple and always works
+  const getUserName = (): string | null => {
+    try {
+      const userStr = localStorage.getItem('current_user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        console.log('User data from localStorage:', user); // Debug log
+        return user.name || null;
+      }
+    } catch (e) {
+      console.error('Error reading user from localStorage:', e); // Debug log
+    }
+    return null;
+  };
+
+  const userName = getUserName();
+  console.log('Welcome message userName:', userName); // Debug log
+
   return (
     <div className={styles.app}>
       <div className={styles.container}>
@@ -227,9 +245,9 @@ function App() {
           <div className={styles.headerTop}>
             <div className={styles.headerTitle}>
               <h1 className={styles.title}>BarakaFlow</h1>
-              {currentUser && (
+              {userName && (
                 <span className={styles.welcomeText}>
-                  Welcome, {currentUser.name}! 👋
+                  Welcome, {userName}! 👋
                 </span>
               )}
             </div>
